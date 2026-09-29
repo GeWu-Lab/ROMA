@@ -132,8 +132,8 @@ class Qwen2_5OmniProcessor(ProcessorMixin):
         images: ImageInput | None = None,
         videos: VideoInput | None = None,
         audio: AudioInput | None = None,
-        tactile: ImageInput | None = None,  # [touch] 新增 tactile 输入（按 image 处理）
-        tactile_token_num: int = 202,      # [touch] 每个 tactile 对应的 token 数
+        tactile: ImageInput | None = None,  # [touch] new tactile input (handled like an image)
+        tactile_token_num: int = 202,      # [touch] number of tokens per tactile input
         **kwargs: Unpack[Qwen2_5OmniProcessorKwargs],
     ) -> BatchFeature:
         """
@@ -216,7 +216,7 @@ class Qwen2_5OmniProcessor(ProcessorMixin):
             video_second_per_grid = iter([])
 
         if tactile is not None:
-            # [touch] tactile 复用 image_processor，但不使用 grid_thw（因为不做 merge）
+            # [touch] tactile reuses image_processor but does not use grid_thw (no merge)
             tactile_lengths = tactile_token_num
             tactile_inputs = {'pixel_values_tactile': tactile}
         else:

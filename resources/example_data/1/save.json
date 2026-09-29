@@ -27,7 +27,7 @@
         "inside_modality_tactile": false,
         "inside_modality_force": false,
         "object_mass_g": "",
-        "folder_name": "玩偶"
+        "folder_name": "doll"
     },
     {
         "object_name": "can",
@@ -57,7 +57,7 @@
         "inside_modality_tactile": false,
         "inside_modality_force": false,
         "object_mass_g": "",
-        "folder_name": "空的易拉罐"
+        "folder_name": "can"
     },
     {
         "object_name": "red box",
@@ -87,7 +87,7 @@
         "inside_modality_tactile": false,
         "inside_modality_force": false,
         "object_mass_g": "",
-        "folder_name": "装塑料圆珠的纸盒"
+        "folder_name": "red_box"
     },
     {
         "object_name": "green cup",
@@ -117,6 +117,6 @@
         "inside_modality_tactile": false,
         "inside_modality_force": false,
         "object_mass_g": "",
-        "folder_name": "装小钢珠的陶瓷杯"
+        "folder_name": "green_cup"
     }
 ]

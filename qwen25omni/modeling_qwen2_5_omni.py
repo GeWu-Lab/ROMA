@@ -384,13 +384,13 @@ class Qwen2_5OmniPreTrainedModelForConditionalGeneration(Qwen2_5OmniPreTrainedMo
                         # ---- tactile body ----
                         st_idx = llm_pos_ids_list[-1].max() + 1 if len(llm_pos_ids_list) > 0 else 0
 
-                        # 找到 eos
+                        # find eos
                         start = min_ed
                         end = start
                         while end < len(input_tokens) and input_tokens[end] != tactile_end_token_id:
                             end += 1
 
-                        tactile_len = end - start  # 中间 token 数
+                        tactile_len = end - start  # number of tokens in between
                         # print('tactile_start_end:', input_ids[start], input_ids[end])
                         # print('tactile_len:', tactile_len)
 
@@ -1791,7 +1791,7 @@ class Qwen2_5OmniThinkerForConditionalGeneration(Qwen2_5OmniPreTrainedModelForCo
 
         tactile_features = self.tactile_tower(pixel_values_tactile)  # [touch]
 
-        tactile_features = self.tactile_proj(tactile_features)  # 对齐 LLM hidden dim [touch]
+        tactile_features = self.tactile_proj(tactile_features)  # align to the LLM hidden dim [touch]
 
         return tactile_features  # (B, N, D) [touch]
 
@@ -3882,20 +3882,20 @@ class Qwen2_5OmniForConditionalGeneration(Qwen2_5OmniPreTrainedModel, Generation
             weights_only=weights_only,
             **kwargs,
         )
-        spk_path = cached_file(
-            pretrained_model_name_or_path,
-            "spk_dict.pt",
-            subfolder=kwargs.pop("subfolder", None),
-            cache_dir=kwargs.pop("cache_dir", None),
-            force_download=kwargs.pop("force_download", False),
-            proxies=kwargs.pop("proxies", None),
-            local_files_only=kwargs.pop("local_files_only", False),
-            token=token,
-            revision=kwargs.pop("revision", None),
-        )
-        if spk_path is None:
-            raise ValueError(f"""{pretrained_model_name_or_path}/{spk_path} not exists""")
-        model.load_speakers(spk_path)
+        # spk_path = cached_file(
+        #     pretrained_model_name_or_path,
+        #     "spk_dict.pt",
+        #     subfolder=kwargs.pop("subfolder", None),
+        #     cache_dir=kwargs.pop("cache_dir", None),
+        #     force_download=kwargs.pop("force_download", False),
+        #     proxies=kwargs.pop("proxies", None),
+        #     local_files_only=kwargs.pop("local_files_only", False),
+        #     token=token,
+        #     revision=kwargs.pop("revision", None),
+        # )
+        # if spk_path is None:
+        #     raise ValueError(f"""{pretrained_model_name_or_path}/{spk_path} not exists""")
+        # model.load_speakers(spk_path)
 
         return model
 
