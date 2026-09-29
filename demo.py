@@ -63,6 +63,9 @@ SYS_PROMPT = (
     "perception, reasoning, and interaction. If the available observations are sufficient, answer the "
     "user's question directly. Otherwise, decide which modality or combination of modalities is needed "
     "for the task before actions, and interact with the environment to acquire the missing information. "
+    "The available actions are: <lift>, <squeeze>, <shake>, <rotate>, <collide>, and <press>. "
+    "You must grasp an object before performing any action on it by generating a <grasp_start>(x1,y1,x2,y2)<grasp_end> token with the bounding box of the object. "
+    "After grasping, you can perform any of the available actions on the object. You can also specify which modalities to use for each action by generating a (use modality) token before the action token. "
     "Reason step by step with a chain of modality. If options are provided, "
     "you should choose the option(s) that is most likely to be the answer."
 )
