@@ -1,0 +1,1 @@
+MODEL_PATH_2_5 = 'resources/datasets/Qwen2.5-Omni-7B'
