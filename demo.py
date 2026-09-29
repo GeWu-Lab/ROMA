@@ -402,10 +402,13 @@ class RomaEngine:
 
                 streamer = TextIteratorStreamer(self.tokenizer, skip_prompt=True, skip_special_tokens=False)
                 result = {}
-                threading.Thread(target=self._generate, args=(inputs, streamer, stop_event, result), daemon=True).start()
+                worker = threading.Thread(target=self._generate, args=(inputs, streamer, stop_event, result), daemon=True)
+                worker.start()
                 for chunk in streamer:
                     block["text"] += chunk
                     yield run
+                # generate() calls streamer.end() before it returns, so wait for the worker to publish its result
+                worker.join()
 
                 if "error" in result:
                     raise result["error"]
