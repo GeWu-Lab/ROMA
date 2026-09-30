@@ -282,8 +282,7 @@ class Run:
         self.parts = []
         self.recorded = 0
         self.current_object = None
-        self.grasp_bbox = None
-        self.grasp_label = None
+        self.grasps = []  # every grasp so far, in order: {"bbox", "label", "folder"}
         self.round = 0
         self.status = "running"  # running / done / stopped / error
 
@@ -416,8 +415,11 @@ class RomaEngine:
                 if matched is None:
                     raise Exception(f"grasp object matching failed: {err}")
                 run.current_object = matched
-                run.grasp_bbox = event["bbox"]
-                run.grasp_label = matched.get("object_name") or matched["folder_name"]
+                run.grasps.append({
+                    "bbox": event["bbox"],
+                    "label": matched.get("object_name") or matched["folder_name"],
+                    "folder": matched["folder_name"],
+                })
             elif run.current_object is None:
                 raise Exception(f"action <{event['action']}> appears before any grasp.")
 
@@ -523,10 +525,21 @@ def file_url(path):
     return "/gradio_api/file=" + html.escape(Path(path).as_posix(), quote=True)
 
 
-def format_model_text(text):
-    """Escape the text and render grasp / action tokens as small chips."""
+GRASP_COLORS = ["#ef4444", "#3b82f6", "#22c55e", "#f59e0b", "#a855f7", "#06b6d4", "#ec4899", "#84cc16"]
+
+
+def grasp_color(index):
+    return GRASP_COLORS[index % len(GRASP_COLORS)]
+
+
+def format_model_text(text, grasp_offset=0):
+    """Escape the text and render grasp / action tokens as small chips.
+
+    Grasp chips are numbered from grasp_offset + 1 (matching the boxes on the scene image).
+    Returns (html, number of grasp chips in this text).
+    """
     text = text.replace('<|im_end|>', '').replace('<|endoftext|>', '')
-    out, pos = [], 0
+    out, pos, n_grasp = [], 0, 0
     for m in _TOKEN_RE.finditer(text):
         out.append(html.escape(text[pos:m.start()]))
         if m.group("act"):
@@ -534,10 +547,15 @@ def format_model_text(text):
             mod = f" <em>· {html.escape(m.group('mod'))}</em>" if m.group("mod") else ""
             out.append(f'<span class="chip chip-act">{ACTION_ICON[act]} {act}{mod}</span>')
         else:
-            out.append(f'<span class="chip chip-grasp">🎯 grasp <code>{html.escape(m.group("box"))}</code></span>')
+            idx = grasp_offset + n_grasp
+            n_grasp += 1
+            out.append(
+                f'<span class="chip chip-grasp" style="--c:{grasp_color(idx)}">🎯 grasp #{idx + 1} '
+                f'<code>{html.escape(m.group("box"))}</code></span>'
+            )
         pos = m.end()
     out.append(html.escape(text[pos:]))
-    return "".join(out)
+    return "".join(out), n_grasp
 
 
 def tile(caption, inner):
@@ -554,25 +572,30 @@ def render_obs_item(item):
                 + tile("✋ Tactile · during contact", f'<img src="{file_url(p1)}">'))
     if t == "audio":
         return tile("🔊 Contact sound", f'<audio controls preload="metadata" src="{file_url(item["audio"])}"></audio>')
-    m = re.search(r"([\d.]+)\s*N", item["text"])
-    value = f'<div class="roma-force"><b>{m.group(1)}</b> N</div>' if m else f'<div>{html.escape(item["text"])}</div>'
-    return tile("⚖️ Mean gravity force", value)
+    # Only force readings are shown; other text items (e.g. the ". " separator fed to the model) are not displayed
+    m = re.search(r"mean gravity force\s*([\d.]+)\s*N", item["text"])
+    if m is None:
+        return ""
+    return tile("⚖️ Mean gravity force", f'<div class="roma-force"><b>{m.group(1)}</b> N</div>')
 
 
 def render_scene(run):
-    box = ""
-    if run is not None and run.grasp_bbox is not None:
-        x1, y1, x2, y2 = run.grasp_bbox
+    boxes = []
+    seen = {}  # grasps per object so far; repeated grasps of one object get a larger, nested box
+    for i, g in enumerate(run.grasps if run is not None else []):
+        x1, y1, x2, y2 = g["bbox"]
         x1, x2 = (min(max(v, 0.0), IMG_W) for v in (x1, x2))
         y1, y2 = (min(max(v, 0.0), IMG_H) for v in (y1, y2))
-        box = (
-            f'<div class="roma-bbox" style="left:{x1 / IMG_W * 100:.2f}%;top:{y1 / IMG_H * 100:.2f}%;'
-            f'width:{(x2 - x1) / IMG_W * 100:.2f}%;height:{(y2 - y1) / IMG_H * 100:.2f}%">'
-            f'<span>{html.escape(str(run.grasp_label))}</span></div>'
+        pad = seen.get(g["folder"], 0) * 6
+        seen[g["folder"]] = seen.get(g["folder"], 0) + 1
+        boxes.append(
+            f'<div class="roma-bbox" style="--c:{grasp_color(i)};left:{x1 / IMG_W * 100:.2f}%;top:{y1 / IMG_H * 100:.2f}%;'
+            f'width:{(x2 - x1) / IMG_W * 100:.2f}%;height:{(y2 - y1) / IMG_H * 100:.2f}%;margin:-{pad}px;padding:{pad}px">'
+            f'<span>#{i + 1} {html.escape(str(g["label"]))}</span></div>'
         )
     return (
         '<div class="roma-scene">'
-        f'<div class="roma-scene-frame"><img src="{file_url(SCENE_IMAGE)}">{box}</div>'
+        f'<div class="roma-scene-frame"><img src="{file_url(SCENE_IMAGE)}">{"".join(boxes)}</div>'
         '<div class="roma-scene-cap">Initial scene</div>'
         '</div>'
     )
@@ -586,10 +609,13 @@ def render_trace(run):
         )
 
     steps = []
+    n_grasp = 0
     for i, b in enumerate(run.blocks):
         streaming = run.status == "running" and i == len(run.blocks) - 1
         if b["kind"] == "model":
-            body = format_model_text(b["text"]) + ('<span class="roma-cursor"></span>' if streaming else "")
+            body, n_new = format_model_text(b["text"], n_grasp)
+            n_grasp += n_new
+            body += '<span class="roma-cursor"></span>' if streaming else ""
             if b["final"]:
                 ans = extract_final_answer(b["text"])
                 badge = f'<span class="roma-answer">Answer · {ans}</span>' if ans else ""
@@ -601,7 +627,7 @@ def render_trace(run):
             mods = "".join(f'<span class="chip chip-mod">{MODALITY_ICON[k]}</span>' for k in ('image', 'tactile', 'audio', 'force') if kws and k in kws)
             grid = "".join(render_obs_item(it) for it in b["items"])
             steps.append(
-                f'<div class="roma-step obs"><div class="roma-step-h">📡 Observation · {ACTION_ICON[b["action"]]} {b["action"]}{mods}</div>'
+                f'<div class="roma-step obs"><div class="roma-step-h">📡 Interaction &amp; Feedback · {ACTION_ICON[b["action"]]} {b["action"]}{mods}</div>'
                 f'<div class="roma-grid">{grid}</div></div>'
             )
         else:
@@ -633,6 +659,8 @@ CSS = """
 .gradio-container button, .gradio-container textarea, .gradio-container input, .gradio-container em,
 .gradio-container b { font-family: Calibri, "Segoe UI", Arial, sans-serif !important; font-weight: 700 !important; }
 .gradio-container textarea, .gradio-container input, .gradio-container label { color: #000 !important; }
+#roma-examples, #roma-examples * { font-family: "Source Sans Pro", ui-sans-serif, system-ui, sans-serif !important;
+  font-weight: 600 !important; font-size: 15px !important; }
 .roma-header { text-align: center; padding: 22px 0 6px; }
 .roma-sub { text-align: center; }
 .roma-title { font-size: 3.6rem; letter-spacing: .08em; line-height: 1.15; }
@@ -645,9 +673,8 @@ CSS = """
 .roma-scene-frame { position: relative; line-height: 0; overflow: hidden; }
 .roma-scene-frame img { width: 100%; display: block; }
 .roma-scene-cap { padding: 8px 14px; font-size: 1.2rem; color: #000; text-align: center; }
-.roma-bbox { position: absolute; border: 2px solid #f43f5e; border-radius: 6px;
-  box-shadow: 0 0 0 9999px rgba(0,0,0,.28); }
-.roma-bbox span { position: absolute; top: 0; left: 0; background: #f43f5e; color: #fff; font-size: 16px;
+.roma-bbox { position: absolute; box-sizing: content-box; border: 3px solid var(--c); border-radius: 6px; }
+.roma-bbox span { position: absolute; top: 0; left: 0; background: var(--c); color: #fff; white-space: nowrap; font-size: 16px;
   line-height: 1.5; padding: 0 8px; border-bottom-right-radius: 6px; }
 
 .roma-empty { text-align: center; padding: 34px 20px; color: #000; font-size: 1.3rem; border: 1px dashed var(--border-color-primary);
@@ -676,7 +703,7 @@ CSS = """
   font-size: .85em; font-weight: 600; margin: 0 2px; }
 .chip code { background: none; padding: 0; color: inherit; font-size: 1em; }
 .chip em { font-style: normal; }
-.chip-grasp { background: rgba(244,63,94,.14); color: #e11d48; }
+.chip-grasp { background: var(--c); color: #fff; }
 .chip-act { background: rgba(99,102,241,.16); color: #6366f1; }
 .chip-mod { background: rgba(16,185,129,.16); color: #059669; }
 
@@ -756,7 +783,8 @@ def build_ui(engine):
                 with gr.Row():
                     stop_btn = gr.Button("Stop", variant="stop")
                     clear_btn = gr.Button("Clear")
-        gr.Examples(examples=[[q] for q in EXAMPLES], inputs=question, label="Try asking")
+        with gr.Column(elem_id="roma-examples"):
+            gr.Examples(examples=[[q] for q in EXAMPLES], inputs=question, label="Try asking")
         trace = gr.HTML(render_trace(None))
 
         for trigger in (run_btn.click, question.submit):
