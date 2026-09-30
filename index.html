@@ -1,0 +1,546 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ROMA: LLM System for Real-World Object-Centric Multi-Sensory Active Perception</title>
+  <meta name="description" content="ROMA is an LLM-based system that actively acquires missing evidence through physical interaction, integrating vision, audio, touch and force in a reasoning-interaction-feedback loop.">
+  <meta name="theme-color" content="#fbfaf6">
+  <meta property="og:title" content="ROMA: Multi-Sensory Active Perception">
+  <meta property="og:description" content="I saw. I touched. I understood. An LLM system that decides what to sense, how to sense it, and when it knows enough.">
+  <link rel="icon" type="image/png" href="assest/logo.png">
+  <link rel="stylesheet" href="styles.css">
+  <script defer src="script.js"></script>
+</head>
+<body>
+
+<header class="nav" id="nav">
+  <div class="nav-inner">
+    <a class="nav-brand" href="#top" aria-label="Back to top">
+      <img src="assest/logo.png" alt="" width="28" height="28"><b>ROMA</b>
+    </a>
+    <nav class="nav-links" aria-label="Sections">
+      <a href="#abstract">Overview</a>
+      <a href="#data">ROMI-2K</a>
+      <a href="#method">Method</a>
+      <a href="#bench">Benchmark</a>
+      <a href="#results">Results</a>
+      <a href="#analysis">Analysis</a>
+      <a href="#cite">Cite</a>
+    </nav>
+    <a class="nav-lab" href="https://gewu-lab.github.io/" target="_blank" rel="noopener"><img src="assest/gewulab.png" alt="GeWu-Lab, Renmin University of China" width="3119" height="1010"></a>
+  </div>
+</header>
+
+<main id="top">
+
+<!-- ============ HERO ============ -->
+<section class="hero">
+  <div class="hero-glow" aria-hidden="true"></div>
+  <div class="wrap hero-inner">
+    <h1 class="title">
+      <span class="brand-row">
+        <img class="hero-logo" src="assest/logo.png" alt="ROMA logo: four puzzle pieces for vision, audio, touch and force around a robot" width="104" height="104">
+        <span class="wordmark" aria-label="ROMA"><span>R</span><span>O</span><span>M</span><span>A</span></span>
+      </span>
+      <span class="subtitle">LLM System for Real-World Object-Centric Multi-Sensory Active Perception</span>
+    </h1>
+    <p class="kicker">I saw. I touched. I understood.</p>
+
+    <ul class="authors">
+      <li><a href="https://xxuan01.github.io/" target="_blank" rel="noopener">Ruoxuan Feng</a><sup>1,2,3,*</sup></li>
+      <li>Yutong Chen<sup>4,*</sup></li>
+      <li><a href="https://scholar.google.com.hk/citations?user=v5LctN8AAAAJ" target="_blank" rel="noopener">Ruihua Song</a><sup>1,2</sup></li>
+      <li><a href="https://hyang0511.github.io/" target="_blank" rel="noopener">Huan Yang</a><sup>3</sup></li>
+      <li><a href="https://www.wangzhongyuan.com/" target="_blank" rel="noopener">Zhongyuan Wang</a><sup>3</sup></li>
+      <li><a href="https://scholar.google.com/citations?user=FLkv_vIAAAAJ" target="_blank" rel="noopener">Guocai Yao</a><sup>3,5</sup></li>
+      <li><a href="https://dtaoo.github.io/" target="_blank" rel="noopener">Di Hu</a><sup>1,2,3,6,&#x2709;</sup></li>
+    </ul>
+    <ol class="affils">
+      <li><sup>1</sup>Gaoling School of Artificial Intelligence, Renmin University of China</li>
+      <li><sup>2</sup>Beijing Key Laboratory of Research on Large Models and Intelligent Governance</li>
+      <li><sup>3</sup>Beijing Academy of Artificial Intelligence</li>
+      <li><sup>4</sup>Beijing Jiaotong University</li>
+      <li><sup>5</sup>Peking University</li>
+      <li><sup>6</sup>AresoX</li>
+    </ol>
+    <p class="notes"><sup>*</sup>Equal contribution &nbsp;&middot;&nbsp; <sup>&#x2709;</sup>Corresponding author</p>
+
+    <nav class="links" aria-label="Project resources">
+      <a class="btn" aria-disabled="true" title="Coming soon">
+        <svg viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></svg>Paper<em>soon</em>
+      </a>
+      <a class="btn" href="https://github.com/GeWu-Lab/ROMA" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24"><path d="m8 7-5 5 5 5M16 7l5 5-5 5M14 4l-4 16"/></svg>Code
+      </a>
+      <a class="btn" href="https://huggingface.co/datasets/GeWuLab/ROMA" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24"><ellipse cx="12" cy="5.5" rx="8" ry="3"/><path d="M4 5.5v6.5c0 1.7 3.6 3 8 3s8-1.3 8-3V5.5M4 12v6.5c0 1.7 3.6 3 8 3s8-1.3 8-3V12"/></svg>Dataset &amp; Checkpoint
+      </a>
+    </nav>
+
+    <!-- Teaser: bare video, no player chrome. Custom controls below. -->
+    <figure class="teaser">
+      <div class="teaser-frame">
+        <video id="teaser" src="assest/teaser.mp4" autoplay muted playsinline preload="auto"
+               disablepictureinpicture disableremoteplayback controlslist="nodownload noplaybackrate nofullscreen"
+               aria-label="ROMA actively interacting with objects to answer a question"></video>
+      </div>
+      <div class="teaser-controls" role="group" aria-label="Teaser playback">
+        <button type="button" class="ctl" id="ctl-play" aria-label="Pause">
+          <svg class="i-pause" viewBox="0 0 24 24"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg>
+          <svg class="i-play" viewBox="0 0 24 24"><path d="M8 5.5v13a1 1 0 0 0 1.5.86l10.5-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5z"/></svg>
+          <span>Pause</span>
+        </button>
+        <button type="button" class="ctl" id="ctl-back" aria-label="Backward 1.5 seconds">
+          <svg viewBox="0 0 24 24"><path d="M11 6.5v11a.8.8 0 0 1-1.25.66l-7-5.5a.8.8 0 0 1 0-1.32l7-5.5A.8.8 0 0 1 11 6.5zM21 6.5v11a.8.8 0 0 1-1.25.66l-7-5.5a.8.8 0 0 1 0-1.32l7-5.5A.8.8 0 0 1 21 6.5z"/></svg>
+          <span>Backward</span>
+        </button>
+        <button type="button" class="ctl" id="ctl-fwd" aria-label="Forward 1.5 seconds">
+          <span>Forward</span>
+          <svg viewBox="0 0 24 24"><path d="M13 6.5v11a.8.8 0 0 0 1.25.66l7-5.5a.8.8 0 0 0 0-1.32l-7-5.5A.8.8 0 0 0 13 6.5zM3 6.5v11a.8.8 0 0 0 1.25.66l7-5.5a.8.8 0 0 0 0-1.32l-7-5.5A.8.8 0 0 0 3 6.5z"/></svg>
+        </button>
+        <button type="button" class="ctl" id="ctl-replay" aria-label="Replay from the start">
+          <svg viewBox="0 0 24 24" class="stroke"><path d="M4 12a8 8 0 1 0 2.6-5.9"/><path d="M4 4v4.5h4.5"/></svg>
+          <span>Replay</span>
+        </button>
+      </div>
+    </figure>
+  </div>
+</section>
+
+<!-- ============ ABSTRACT ============ -->
+<section class="section" id="abstract">
+  <div class="wrap">
+    <header class="sec-head">
+      <p class="eyebrow"><i></i>Overview</p>
+      <h2>Sensing that goes and gets what it needs</h2>
+    </header>
+
+    <div class="abstract-grid">
+      <div class="abstract-text reveal">
+        <p>Humans understand the physical world through an <em>active</em> process. When sensory evidence is insufficient, we interact: we lift an object to feel its weight, or shake it to hear what is inside. Existing multi-sensory robot systems mostly <em>integrate</em> the inputs they are given, rather than <em>acquire</em> the evidence they are missing.</p>
+        <p><strong>ROMA</strong> is an LLM-based system that closes this gap. It integrates vision, audio, tactile and force sensing into a <em>reasoning&ndash;interaction&ndash;feedback</em> loop: the model identifies missing evidence and chooses the target object, interaction and modality, while a physical interface executes it and returns the multi-sensory feedback.</p>
+      </div>
+      <ul class="three-asks reveal" aria-label="What ROMA decides">
+        <li><b>What</b><span>information is missing?</span></li>
+        <li><b>How</b><span>to acquire it?</span></li>
+        <li><b>When</b><span>is the evidence sufficient?</span></li>
+      </ul>
+    </div>
+
+    <ul class="stats reveal" aria-label="Key numbers">
+      <li><b data-count="2000" data-prefix="~">~2,000</b><span>everyday objects</span></li>
+      <li><b data-count="6">6</b><span>atomic interactions</span></li>
+      <li><b data-count="4">4</b><span>sensory modalities</span></li>
+      <li><b data-count="2100">2,100</b><span>benchmark tasks</span></li>
+      <li><b data-count="72.9" data-dec="1">72.9%</b><span>ROMA-7B success<br>(best baseline 53.0%)</span></li>
+    </ul>
+
+    <div class="contribs">
+      <a class="contrib c-blue reveal" href="#data">
+        <span class="tag">Dataset</span>
+        <h3>ROMI-2K</h3>
+        <p>Real-world object&ndash;interaction data with synchronized vision, audio, touch and force, for handheld objects and robot tabletop scenes.</p>
+      </a>
+      <a class="contrib c-orange reveal" href="#method">
+        <span class="tag">System</span>
+        <h3>ROMA-7B</h3>
+        <p>A multi-sensory LLM trained in two stages, paired with a grasp-and-interact physical interface that runs on a real robot arm.</p>
+      </a>
+      <a class="contrib c-green reveal" href="#bench">
+        <span class="tag">Benchmark</span>
+        <h3>ROMA Bench</h3>
+        <p>Perception chains for single-attribute, long-horizon multi-attribute and intent-driven active perception.</p>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ============ DATA ============ -->
+<section class="section tint" id="data">
+  <div class="wrap">
+    <header class="sec-head">
+      <p class="eyebrow"><i></i>ROMI-2K</p>
+      <h2>Real-world object interaction, at object scale</h2>
+      <p class="lead">Existing datasets trade object diversity against interaction diversity. ROMI-2K covers nearly 2,000 everyday objects, each with six atomic interactions and synchronized multi-sensory feedback, collected two complementary ways.</p>
+    </header>
+
+    <div class="subsets">
+      <article class="subset reveal">
+        <span class="tag c-blue">Handheld collection</span>
+        <h3>1,657 object&ndash;content combinations</h3>
+        <p>A modified multi-sensory UMI (Pika Sense with a microphone and two GelSight Mini sensors). Every object is handled at 3 grasp locations, and container contents are varied to capture diverse audio.</p>
+        <ul class="chips"><li class="vision">Wrist + third view</li><li class="audio">Audio</li><li class="touch">Touch &times; 2</li></ul>
+      </article>
+      <article class="subset reveal">
+        <span class="tag c-purple">Tabletop scenes</span>
+        <h3>500 scenes, 1&ndash;5 objects each</h3>
+        <p>An xArm 6 with a Robotiq 2F-140 gripper grasps each object and runs all six interactions. 400 scenes for training and 100 for test, including 56 unseen objects.</p>
+        <ul class="chips"><li class="vision">RGB + depth</li><li class="audio">Audio</li><li class="touch">Touch &times; 2</li><li class="force">6-axis force</li></ul>
+      </article>
+    </div>
+
+    <div class="explorer reveal">
+      <div class="explorer-head">
+        <p class="panel-label">Dataset statistics</p>
+        <div class="tabs" role="tablist" aria-label="Choose a subset" id="data-tabs"></div>
+      </div>
+      <div class="explorer-body">
+        <div>
+          <p class="chart-title">Object materials</p>
+          <div class="hbars" id="chart-materials"></div>
+        </div>
+        <div class="explorer-side">
+          <p class="chart-title">Objects with contents inside</p>
+          <div class="donut-wrap" id="chart-contents"></div>
+        </div>
+      </div>
+    </div>
+
+    <p class="fine reveal">Every object is annotated (Gemini&nbsp;3.5&nbsp;Flash, then manually verified) with identity, material, hardness, roughness, texture, contents, and the sensory modality that can reveal them.</p>
+  </div>
+</section>
+
+<!-- ============ METHOD (loop + system) ============ -->
+<section class="section" id="method">
+  <div class="wrap">
+    <header class="sec-head">
+      <p class="eyebrow"><i></i>Method</p>
+      <h2>A reasoning&ndash;interaction&ndash;feedback loop</h2>
+      <p class="lead">Given an instruction and an initial scene, ROMA decides whether the current evidence is enough. If not, it names the object, the interaction and the modalities to read, then reasons over what comes back, until it can answer.</p>
+    </header>
+
+    <div class="loop reveal" aria-label="The ROMA loop">
+      <a class="loop-node n-llm" href="#step-reason">
+        <span class="step">1</span>
+        <h3>Reason</h3>
+        <p>The Multi-Sensory LLM (ROMA-7B) finds what is missing, then picks the target object, action token and modalities.</p>
+      </a>
+      <div class="loop-arrow" aria-hidden="true"></div>
+      <a class="loop-node n-act" href="#step-interact">
+        <span class="step">2</span>
+        <h3>Interact</h3>
+        <p>A grasp interface and six atomic interactions turn the decision into robot motion.</p>
+      </a>
+      <div class="loop-arrow" aria-hidden="true"></div>
+      <a class="loop-node n-fb" href="#step-sense">
+        <span class="step">3</span>
+        <h3>Sense</h3>
+        <p>Vision, audio, touch and force are recorded, encoded and returned for the next decision.</p>
+      </a>
+      <svg class="loop-back" viewBox="0 0 1000 46" preserveAspectRatio="none" aria-hidden="true">
+        <path d="M930 2 V26 Q930 40 916 40 H84 Q70 40 70 26 V6" />
+        <path class="head" d="M63 14 L70 4 L77 14" />
+      </svg>
+      <p class="loop-back-label">until the evidence is sufficient &rarr; answer</p>
+    </div>
+
+    <figure class="figure reveal">
+      <img src="assest/model.png" alt="ROMA system overview: grasp interface, six real-world interactions, multi-sensor feedback and the Multi-Sensory LLM ROMA-7B" width="3832" height="1832" loading="lazy">
+      <figcaption>Given an initial scene and an instruction, the LLM names the target object, interaction and modality. The interface executes and returns visual, audio, tactile and force feedback.</figcaption>
+    </figure>
+
+    <!-- 1 · Reason -->
+    <div class="stage" id="step-reason" style="--c: var(--blue)">
+      <header class="stage-head reveal"><span class="step">1</span><div><h3>Reason</h3><p>ROMA-7B, built on Qwen2.5-Omni, learns to judge sufficiency and choose what to sense next.</p></div></header>
+      <div class="method-grid three">
+        <article class="card reveal">
+          <span class="num">Tokens</span>
+          <h3>Action &amp; modality tokens</h3>
+          <p>Six action tokens, <code>&lt;grasp_start&gt;</code>/<code>&lt;grasp_end&gt;</code> around a bounding box, and positional tokens for touch and force. Each is initialized from the averaged embeddings of its words plus Gaussian noise.</p>
+        </article>
+        <article class="card reveal">
+          <span class="num">Stage 1</span>
+          <h3>Multi-sensory alignment</h3>
+          <p>Audio and touch are aligned to the vision&ndash;text space with audio-text, audio-visual-text, tactile-text and tactile-visual-text instruction tuning, so ambiguous signals are grounded in object semantics.</p>
+        </article>
+        <article class="card reveal">
+          <span class="num">Stage 2</span>
+          <h3>Active perception SFT</h3>
+          <p>The model analyzes the scene, decides whether evidence is sufficient, and otherwise emits the next object, interaction and modalities. It then reasons over the returned feedback and repeats.</p>
+        </article>
+      </div>
+      <div class="curriculum reveal">
+        <div class="curriculum-copy">
+          <p class="panel-label">Dynamic scene sampling</p>
+          <h3>A smooth shift from touching things to solving scenes</h3>
+          <p>Handheld and pseudo-scene samples draw positions from Beta(1, &alpha;), real-scene samples from Beta(&alpha;, 1), with &alpha;&nbsp;=&nbsp;2.5. Sorting by position front-loads interaction-level supervision and leaves realistic scenes, and the force modality, for late training.</p>
+        </div>
+        <div id="chart-beta" class="beta"></div>
+      </div>
+    </div>
+
+    <!-- 2 · Interact -->
+    <div class="stage" id="step-interact" style="--c: var(--orange)">
+      <header class="stage-head reveal"><span class="step">2</span><div><h3>Interact</h3><p>A training-free grasp policy plus six pre-defined interactions form the interface between the LLM and the robot.</p></div></header>
+      <div class="interact-grid">
+        <article class="card reveal">
+          <span class="num">Grasp interface</span>
+          <h3>Stable contact for sensing</h3>
+          <p>AnyGrasp proposes grasps from the object&rsquo;s point cloud. A symmetry-based completion recovers geometry that transparent and reflective objects lose, then candidates are filtered by height, reachability and orientation, and refined for our gripper.</p>
+        </article>
+        <div class="panel reveal">
+          <p class="panel-label">Six atomic interactions</p>
+          <ul class="act-grid">
+            <li><code>&lt;lift&gt;</code><span>Raise the object and hold it</span></li>
+            <li><code>&lt;press&gt;</code><span>Press it down against the table</span></li>
+            <li><code>&lt;collide&gt;</code><span>Tap it on the table, repeatedly</span></li>
+            <li><code>&lt;shake&gt;</code><span>Shake it back and forth</span></li>
+            <li><code>&lt;rotate&gt;</code><span>Turn it 180&deg; about the grasp axis</span></li>
+            <li><code>&lt;squeeze&gt;</code><span>Close the gripper a little further</span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3 · Sense -->
+    <div class="stage" id="step-sense" style="--c: var(--green)">
+      <header class="stage-head reveal"><span class="step">3</span><div><h3>Sense</h3><p>Every interaction is recorded by four modalities; the model chooses which of them to read.</p></div></header>
+      <div class="mod-grid">
+        <article class="mod-card m-vision reveal"><h4>Vision</h4><p>One wrist-camera image per interaction; the initial scene comes from RGB-D views.</p></article>
+        <article class="mod-card m-audio reveal"><h4>Audio</h4><p>One cropped microphone segment, most informative for <code>&lt;shake&gt;</code> and <code>&lt;rotate&gt;</code>.</p></article>
+        <article class="mod-card m-touch reveal"><h4>Touch</h4><p>Two GelSight Mini images, one at the start and one during the interaction.</p></article>
+        <article class="mod-card m-force reveal"><h4>Force</h4><p>A wrist force sensor. The mean gravity component is given to the LLM as text.</p></article>
+      </div>
+      <p class="eq-line reveal">Raw force is moved to the robot base frame and the empty-gripper force is removed:
+        <span class="eq">F<sub>trans</sub> = R<sub>B&larr;G</sub> R<sub>G&larr;S</sub> (F<sub>raw</sub> &minus; F<sub>raw</sub><sup>0</sup>)</span></p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ BENCH ============ -->
+<section class="section tint" id="bench">
+  <div class="wrap">
+    <header class="sec-head">
+      <p class="eyebrow"><i></i>ROMA Bench</p>
+      <h2>Perception chains</h2>
+      <p class="lead">Active perception unfolds as a chain: each interaction gives new evidence that shapes the next one. ROMA Bench holds 2,100 scene-level tasks from the tabletop test split, in three flavors.</p>
+    </header>
+
+    <svg class="svg-defs" width="0" height="0" aria-hidden="true" focusable="false">
+      <defs>
+        <marker id="ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0,1 L9,5 L0,9 z" fill="#98a2b5"/></marker>
+        <marker id="ahp" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0,1 L9,5 L0,9 z" fill="#7a63cc"/></marker>
+      </defs>
+    </svg>
+    <div class="chains">
+      <article class="chain reveal">
+        <span class="tag c-blue">Single-chain</span>
+        <p class="q">&ldquo;Which objects are empty?&rdquo;</p>
+        <svg class="chain-svg" viewBox="0 0 300 132" role="img" aria-label="One question, one chain: Empty? then shake with audio, then answer">
+          <rect class="k" x="8" y="52" width="62" height="28" rx="8"/><text class="t" x="39" y="70" text-anchor="middle">Empty?</text>
+          <path class="ln" d="M70 66 H90" marker-end="url(#ah)"/>
+          <rect class="k act" x="92" y="52" width="84" height="28" rx="8"/><text class="t" x="124" y="70" text-anchor="middle">shake</text>
+          <circle class="bd a" cx="158" cy="66" r="8"/><text class="bt" x="158" y="69.2" text-anchor="middle">A</text>
+          <path class="ln" d="M176 66 H196" marker-end="url(#ah)"/>
+          <rect class="k ans" x="198" y="52" width="72" height="28" rx="8"/><text class="t w" x="234" y="70" text-anchor="middle">Answer</text>
+        </svg>
+        <p>One target attribute, one chain of interactions.</p>
+      </article>
+      <article class="chain reveal">
+        <span class="tag c-orange">Multi-chain</span>
+        <p class="q">&ldquo;Is the heaviest object also empty?&rdquo;</p>
+        <svg class="chain-svg" viewBox="0 0 300 132" role="img" aria-label="Two chains: Heavy? then lift with force, and Empty? then shake with audio plus force reused from lift">
+          <rect class="k" x="8" y="20" width="58" height="28" rx="8"/><text class="t" x="37" y="38" text-anchor="middle">Heavy?</text>
+          <path class="ln" d="M66 34 H86" marker-end="url(#ah)"/>
+          <rect class="k act" x="88" y="20" width="66" height="28" rx="8"/><text class="t" x="108" y="38" text-anchor="middle">lift</text>
+          <circle class="bd f" cx="139" cy="34" r="8"/><text class="bt" x="139" y="37.2" text-anchor="middle">F</text>
+          <path class="ln" d="M154 34 H236" marker-end="url(#ah)"/>
+          <rect class="k ans" x="238" y="20" width="54" height="28" rx="8"/><text class="t w" x="265" y="38" text-anchor="middle">Answer</text>
+
+          <rect class="k" x="8" y="84" width="58" height="28" rx="8"/><text class="t" x="37" y="102" text-anchor="middle">Empty?</text>
+          <path class="ln" d="M66 98 H86" marker-end="url(#ah)"/>
+          <rect class="k act" x="88" y="84" width="66" height="28" rx="8"/><text class="t" x="108" y="102" text-anchor="middle">shake</text>
+          <circle class="bd a" cx="139" cy="98" r="8"/><text class="bt" x="139" y="101.2" text-anchor="middle">A</text>
+          <path class="ln" d="M154 98 H168" marker-end="url(#ah)"/>
+          <rect class="k reuse" x="170" y="84" width="56" height="28" rx="8"/>
+          <circle class="bd f" cx="185" cy="98" r="8"/><text class="bt" x="185" y="101.2" text-anchor="middle">F</text>
+          <text class="t p" x="209" y="102" text-anchor="middle">reuse</text>
+          <path class="ln" d="M226 98 H236" marker-end="url(#ah)"/>
+          <rect class="k ans" x="238" y="84" width="54" height="28" rx="8"/><text class="t w" x="265" y="102" text-anchor="middle">Answer</text>
+
+          <path class="ln reuse-ln" d="M121 48 C121 72 198 62 198 82" marker-end="url(#ahp)"/>
+        </svg>
+        <p>Several attributes. Chains share feedback, so redundant interactions should be skipped.</p>
+      </article>
+      <article class="chain reveal">
+        <span class="tag c-green">Intent-driven</span>
+        <p class="q">&ldquo;Find me a treat to eat.&rdquo;</p>
+        <svg class="chain-svg" viewBox="0 0 300 132" role="img" aria-label="An instruction is analyzed into two chains, Heavy? with lift and Empty? with shake, sharing force feedback, leading to one answer">
+          <rect class="k intent" x="6" y="52" width="70" height="28" rx="8"/><text class="t" x="41" y="70" text-anchor="middle">Instruction</text>
+          <path class="ln" d="M76 66 C86 66 86 34 96 34" marker-end="url(#ah)"/>
+          <path class="ln" d="M76 66 C86 66 86 98 96 98" marker-end="url(#ah)"/>
+
+          <rect class="k" x="98" y="20" width="52" height="28" rx="8"/><text class="t" x="124" y="38" text-anchor="middle">Heavy?</text>
+          <path class="ln" d="M150 34 H160" marker-end="url(#ah)"/>
+          <rect class="k act" x="162" y="20" width="62" height="28" rx="8"/><text class="t" x="178" y="38" text-anchor="middle">lift</text>
+          <circle class="bd f" cx="208" cy="34" r="8"/><text class="bt" x="208" y="37.2" text-anchor="middle">F</text>
+
+          <rect class="k" x="98" y="84" width="52" height="28" rx="8"/><text class="t" x="124" y="102" text-anchor="middle">Empty?</text>
+          <path class="ln" d="M150 98 H160" marker-end="url(#ah)"/>
+          <rect class="k act" x="162" y="84" width="62" height="28" rx="8"/><text class="t" x="178" y="102" text-anchor="middle">shake</text>
+          <circle class="bd a" cx="208" cy="98" r="8"/><text class="bt" x="208" y="101.2" text-anchor="middle">A</text>
+
+          <path class="ln reuse-ln" d="M193 48 V82" marker-end="url(#ahp)"/>
+          <text class="t p" x="187" y="70" text-anchor="end">reuse</text>
+
+          <path class="ln" d="M224 34 C236 34 236 58 244 60" marker-end="url(#ah)"/>
+          <path class="ln" d="M224 98 C236 98 236 74 244 72" marker-end="url(#ah)"/>
+          <rect class="k ans" x="246" y="52" width="48" height="28" rx="8"/><text class="t w" x="270" y="70" text-anchor="middle">Answer</text>
+        </svg>
+        <p>The model infers which attributes matter from an implicit goal, then chains them.</p>
+      </article>
+    </div>
+
+    <div class="bench-charts">
+      <div class="panel reveal">
+        <p class="chart-title">Tasks by type</p>
+        <div class="donut-wrap" id="chart-tasks"></div>
+        <p class="chart-title spaced">Question formats</p>
+        <ul class="chips neutral"><li>Multiple choice</li><li>True or false</li><li>Ranking</li></ul>
+        <ul class="facts">
+          <li><b>100</b> held-out scenes with <b>56</b> unseen objects</li>
+          <li><b>132</b> free-form tasks re-created in 8 real scenes</li>
+          <li>Intent-driven questions written from scene annotations</li>
+        </ul>
+      </div>
+      <div class="panel reveal">
+        <p class="chart-title">Which attributes appear together</p>
+        <div id="chart-chord" class="chord"></div>
+        <p class="fine center">Arc length: tasks involving the attribute (Single + Multi-Chain). Ribbons: attribute pairs co-occurring in Multi-Chain tasks; ribbon widths are illustrative.</p>
+      </div>
+    </div>
+
+    <p class="fine reveal">A predicted grasp box must overlap a ground-truth object by at least 70%, otherwise the task fails. All test objects are disjoint from the training and handheld data.</p>
+  </div>
+</section>
+
+<!-- ============ RESULTS ============ -->
+<section class="section" id="results">
+  <div class="wrap">
+    <header class="sec-head">
+      <p class="eyebrow"><i></i>Results</p>
+      <h2>ROMA-7B beats frontier MLLMs on active perception</h2>
+      <p class="lead">Long-chain and multi-attribute tasks are where ROMA opens the widest gap. Numbers are task success rates (%).</p>
+    </header>
+
+    <div class="panel reveal">
+      <div class="explorer-head">
+        <p class="panel-label">Success rate by task type</p>
+        <div class="tabs" role="tablist" aria-label="Choose an evaluation setting" id="res-tabs"></div>
+      </div>
+      <div class="cols" id="chart-models"></div>
+      <ul class="model-legend" id="model-legend"></ul>
+      <p class="fine" id="res-note"></p>
+    </div>
+
+    <div class="panel reveal">
+      <p class="panel-label">Per-attribute success on ROMA Bench</p>
+      <div class="table-scroll"><table class="heat" id="heat"></table></div>
+      <p class="fine">Har. hardness &middot; Rou. roughness &middot; Tex. texture &middot; Ins. inside contents &middot; Mat. material &middot; Wei. weight. Darker is higher; bold marks the best in each column.</p>
+    </div>
+
+    <div class="wins">
+      <div class="win reveal"><b>91.5</b><span>weight, single-chain<br>(force + lift)</span></div>
+      <div class="win reveal"><b>81.0</b><span>texture, single-chain<br>(touch)</span></div>
+      <div class="win reveal"><b>+24.2</b><span>multi-chain, over the<br>best baseline</span></div>
+      <div class="win reveal"><b>61.4</b><span>real robot, free-form,<br>vs 41.7 best baseline</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ANALYSIS ============ -->
+<section class="section tint" id="analysis">
+  <div class="wrap">
+    <header class="sec-head">
+      <p class="eyebrow"><i></i>Analysis</p>
+      <h2>How ROMA interacts, and why each sense matters</h2>
+    </header>
+
+    <div class="analysis-grid">
+      <div class="acol">
+        <div class="panel reveal">
+          <p class="chart-title">Accuracy vs. interaction cost</p>
+          <div id="chart-scatter"></div>
+          <p class="fine">Interactions per scene on ROMA Bench with oracle boxes. <b>Exhaustive</b> grasps every object and runs all six interactions, about 4&times; the cost of ROMA-7B. GPT-5.4 and Gemini stop earlier, but often before the evidence is sufficient.</p>
+        </div>
+        <div class="panel reveal">
+          <p class="chart-title">Training ablations</p>
+          <div class="hbars neg" id="chart-ablation"></div>
+          <p class="fine">Drop in overall success (72.9%) when one component is removed.</p>
+        </div>
+      </div>
+      <div class="acol">
+        <div class="panel reveal">
+          <p class="chart-title">Share of each interaction</p>
+          <div class="stack" id="chart-actions"></div>
+          <ul class="stack-legend" id="actions-legend"></ul>
+          <p class="fine">Frontier models lean on <code>&lt;lift&gt;</code> and <code>&lt;squeeze&gt;</code>. ROMA uses <code>&lt;rotate&gt;</code>, <code>&lt;press&gt;</code> and <code>&lt;collide&gt;</code> as complementary probes.</p>
+        </div>
+        <div class="panel reveal">
+          <p class="chart-title">Take a sense away, lose the matching skill</p>
+          <div class="dumbbells" id="chart-modality"></div>
+          <p class="fine">Single-chain success when the modality returns &ldquo;Not Available&rdquo;. Overall: 72.9 &rarr; 64.1 without audio, 62.7 without touch, 62.2 without force.</p>
+        </div>
+      </div>
+    </div>
+
+    <h3 class="sub-h reveal">A case study</h3>
+    <div class="case-q reveal">
+      <p><b>Question:</b> Which of the three rightmost objects are empty?</p>
+      <p><b>GT:</b> the white box</p>
+    </div>
+    <div class="cases">
+      <article class="case bad reveal">
+        <header><h4>GPT-5.4</h4><span class="verdict">&#10005; the grey cube</span></header>
+        <p class="script"><span class="tk">&lt;grasp&gt;</span> white box on the left <span class="tk">&lt;\grasp&gt;</span> <span class="use">(use touch and force)</span> <span class="tk">&lt;shake&gt;</span>. The grey block is not a container. <span class="tk">&lt;grasp&gt;</span> black box on the right <span class="tk">&lt;\grasp&gt;</span> <span class="use">(use touch and force)</span> <span class="tk">&lt;squeeze&gt;</span>. <b>[the grey cube]</b></p>
+        <ul class="flags"><li>Inappropriate action&ndash;modality pairs</li><li>Lack of active interaction due to overconfidence</li></ul>
+      </article>
+      <article class="case bad reveal">
+        <header><h4>Gemini 3.5 Flash</h4><span class="verdict">&#10005; the grey cube</span></header>
+        <p class="script">I need to interact with each of them (the white box, the grey cube, and the black box) by shaking them to hear if there is anything inside. <span class="tk">&lt;grasp&gt;</span> <span class="tk">&lt;\grasp&gt;</span> <span class="use">(use audio and force)</span> <span class="tk">&lt;shake&gt;</span>. <span class="tk">&lt;grasp&gt;</span> <span class="tk">&lt;\grasp&gt;</span> <span class="use">(use audio and force)</span> <span class="tk">&lt;shake&gt;</span>. <span class="tk">&lt;grasp&gt;</span> <span class="tk">&lt;\grasp&gt;</span> <span class="use">(use audio and force)</span> <span class="tk">&lt;shake&gt;</span>. The answer is <b>[the grey cube]</b>.</p>
+        <ul class="flags"><li>Inappropriate action&ndash;modality pairs</li></ul>
+      </article>
+      <article class="case good reveal">
+        <header><h4>ROMA-7B</h4><span class="verdict">&#10003; the white box</span></header>
+        <p class="script"><span class="tk">&lt;grasp&gt;</span> the white box <span class="tk">&lt;\grasp&gt;</span> <span class="use">(use audio)</span> <span class="tk">&lt;shake&gt;</span> <span class="use">(use audio)</span> <span class="tk">&lt;rotate&gt;</span>. &hellip; little noise. <span class="use">(use vision, touch and force)</span> <span class="tk">&lt;squeeze&gt;</span>. The mean gravity force &hellip; similar to an empty version. <span class="tk">&lt;grasp&gt;</span> the grey block <span class="tk">&lt;\grasp&gt;</span> <span class="use">(use audio)</span> <span class="tk">&lt;shake&gt;</span> The object produces &hellip; when shaken. <span class="tk">&lt;grasp&gt;</span> the black box <span class="tk">&lt;\grasp&gt;</span> <span class="use">(use audio)</span> <span class="tk">&lt;shake&gt;</span>. The object produces &hellip; when shaken. The answer is <b>the white box</b>.</p>
+        <ul class="flags good"><li>Continues interacting when evidence is insufficient</li><li>Selects complementary actions and modalities</li></ul>
+      </article>
+    </div>
+    <p class="fine reveal">GPT-5.4 tends to stop with fewer interactions, occasionally skipping critical objects and sensory evidence. GPT-5.4 and Gemini 3.5 Flash also pair actions and modalities badly, for example trying to read gravity force during vigorous shaking.</p>
+  </div>
+</section>
+
+<!-- ============ CITE ============ -->
+<section class="section" id="cite">
+  <div class="wrap narrow">
+    <header class="sec-head">
+      <p class="eyebrow"><i></i>Citation</p>
+      <h2>BibTeX</h2>
+    </header>
+    <div class="bib reveal">
+      <button type="button" class="copy" id="copy-bib">Copy</button>
+      <pre id="bibtex">@article{feng2026roma,
+  title   = {ROMA: LLM System for Real-World Object-Centric Multi-Sensory Active Perception},
+  author  = {Feng, Ruoxuan and Chen, Yutong and Song, Ruihua and Yang, Huan and
+             Wang, Zhongyuan and Yao, Guocai and Hu, Di},
+  journal = {arXiv preprint},
+  year    = {2026}
+}</pre>
+    </div>
+    <p class="fine center">Supported in part by the Beijing Major Science and Technology Project (Z251100008125018) and the Beijing Academy of Artificial Intelligence (BAAI). We thank Siyu Mei and Mingxin Wang for help with data collection and annotation.</p>
+  </div>
+</section>
+
+</main>
+
+<footer class="footer">
+  <div class="wrap">
+    <img src="assest/logo.png" alt="" width="26" height="26">
+    <span><b>ROMA</b> &middot; GeWu-Lab, Renmin University of China</span>
+    <a href="#top">Back to top &uarr;</a>
+  </div>
+</footer>
+
+</body>
+</html>
