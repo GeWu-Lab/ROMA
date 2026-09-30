@@ -67,6 +67,7 @@ from qwen25omni.configuration_qwen2_5_omni import (
 )
 from anytouch2.tactile_mae import TactileVideoMAE
 from transformers import AutoConfig
+from config.global_name import MODEL_PATH_2_5
 
 
 logger = logging.get_logger(__name__)
@@ -1762,7 +1763,7 @@ class Qwen2_5OmniThinkerForConditionalGeneration(Qwen2_5OmniPreTrainedModelForCo
         self.lm_head = nn.Linear(config.text_config.hidden_size, config.text_config.vocab_size, bias=False)
         self.spatial_merge_size = config.vision_config.spatial_merge_size
         self.rope_deltas = None
-        tactile_config = AutoConfig.from_pretrained('/root/ROMA-Qwen2.5-Omni-7B/config-anytouch2.json')
+        tactile_config = AutoConfig.from_pretrained(MODEL_PATH_2_5 + '/config-anytouch2.json')
         self.tactile_tower = TactileVideoMAE(2, tactile_config, 2, 1)
         self.tactile_proj = nn.Linear(tactile_config.vision_config.hidden_size, config.audio_config.output_dim)
         self.post_init()

@@ -2,10 +2,6 @@ import os
 import argparse
 
 parser = argparse.ArgumentParser(description="ROMA active-perception web demo")
-parser.add_argument(
-    '--model_path', default='/root/ROMA-Qwen2.5-Omni-7B',
-    help='ROMA-Qwen2.5-Omni-7B directory containing Qwen2.5-Omni-7B/, anytouch2.pth, audio.pth, tactile.bin and ROMA-LLM.bin.',
-)
 parser.add_argument('--gpu', type=int, default=0, help='CUDA device id to bind this process to (default: leave CUDA_VISIBLE_DEVICES untouched).')
 parser.add_argument('--host', default='0.0.0.0')
 parser.add_argument('--port', type=int, default=7860)
@@ -32,6 +28,7 @@ from my_qwen_omni_utils import process_mm_info
 from qwen25omni.modeling_qwen2_5_omni import Qwen2_5OmniForConditionalGeneration
 from qwen25omni.processing_qwen2_5_omni import Qwen2_5OmniProcessor
 from utils.util import smart_tokenizer_and_embedding_resize_with_init
+from config.global_name import MODEL_PATH_2_5
 
 # ============================================================
 # Single-QA web version of the active-perception loop in eval.py:
@@ -798,7 +795,7 @@ def build_ui(engine):
 
 
 if __name__ == "__main__":
-    engine = RomaEngine(cli_args.model_path)
+    engine = RomaEngine(MODEL_PATH_2_5)
     demo, launch_style = build_ui(engine)
     demo.queue(max_size=8).launch(
         server_name=cli_args.host,
