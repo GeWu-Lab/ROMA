@@ -56,6 +56,9 @@ ACTION_FOLDER_MAP = {
     "press": "press",
 }
 
+# The user turn is: QUESTION_PREFIX + [initial image] + " " + question (mind the spaces)
+QUESTION_PREFIX = "There are some objects on the table. You are given the visual observation of the objects. "
+
 SYS_PROMPT = (
     "You are ROMA, an embodied robot assistant based on the Qwen model. "
     "You perceive the environment through vision, audition, touch, and force, and interact with it by "
@@ -394,8 +397,13 @@ class RomaEngine:
         self.stop_event = stop_event = threading.Event()
         messages = [
             {"role": "system", "content": [{"type": "text", "text": SYS_PROMPT}]},
-            {"role": "user", "content": [{"type": "image", "image": str(SCENE_IMAGE)}, {"type": "text", "text": question}]},
+            {"role": "user", "content": [
+                {"type": "text", "text": QUESTION_PREFIX},
+                {"type": "image", "image": str(SCENE_IMAGE)},
+                {"type": "text", "text": " " + question},
+            ]},
         ]
+        print(messages)
         try:
             while run.round < MAX_ROUNDS:
                 block = {"kind": "model", "round": run.round + 1, "text": "", "final": False}
@@ -445,6 +453,7 @@ class RomaEngine:
                 yield run
 
             run.status = "done"  # rounds exhausted: finish right away, same as eval.py
+            print(self.tokenizer.decode(result["output"][0].tolist()))
             yield run
         except Exception as e:
             print(f"[ERROR] {e!r}")
