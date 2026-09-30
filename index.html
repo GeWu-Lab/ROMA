@@ -21,8 +21,8 @@
     </a>
     <nav class="nav-links" aria-label="Sections">
       <a href="#abstract">Overview</a>
-      <a href="#data">ROMI-2K</a>
-      <a href="#method">Method</a>
+      <a href="#data">Dataset</a>
+      <a href="#method">System</a>
       <a href="#bench">Benchmark</a>
       <a href="#results">Results</a>
       <a href="#analysis">Analysis</a>
@@ -113,7 +113,7 @@
   <div class="wrap">
     <header class="sec-head">
       <p class="eyebrow"><i></i>Overview</p>
-      <h2>Sensing that goes and gets what it needs</h2>
+      <h2>From passive sensory integration to active evidence acquisition</h2>
     </header>
 
     <div class="abstract-grid">
@@ -160,8 +160,8 @@
 <section class="section tint" id="data">
   <div class="wrap">
     <header class="sec-head">
-      <p class="eyebrow"><i></i>ROMI-2K</p>
-      <h2>Real-world object interaction, at object scale</h2>
+      <p class="eyebrow"><i></i>Dataset</p>
+      <h2>ROMI-2K: Object-Centric Multi-Sensory Interaction Dataset</h2>
       <p class="lead">Existing datasets trade object diversity against interaction diversity. ROMI-2K covers nearly 2,000 everyday objects, each with six atomic interactions and synchronized multi-sensory feedback, collected two complementary ways.</p>
     </header>
 
@@ -205,28 +205,28 @@
 <section class="section" id="method">
   <div class="wrap">
     <header class="sec-head">
-      <p class="eyebrow"><i></i>Method</p>
-      <h2>A reasoning&ndash;interaction&ndash;feedback loop</h2>
+      <p class="eyebrow"><i></i>System</p>
+      <h2>ROMA System: A Reasoning&ndash;Interaction&ndash;Feedback Loop</h2>
       <p class="lead">Given an instruction and an initial scene, ROMA decides whether the current evidence is enough. If not, it names the object, the interaction and the modalities to read, then reasons over what comes back, until it can answer.</p>
     </header>
 
     <div class="loop reveal" aria-label="The ROMA loop">
-      <a class="loop-node n-llm" href="#step-reason">
+      <a class="loop-node n-llm" href="#step-reasoning">
         <span class="step">1</span>
-        <h3>Reason</h3>
+        <h3>Reasoning</h3>
         <p>The Multi-Sensory LLM (ROMA-7B) finds what is missing, then picks the target object, action token and modalities.</p>
       </a>
       <div class="loop-arrow" aria-hidden="true"></div>
-      <a class="loop-node n-act" href="#step-interact">
+      <a class="loop-node n-act" href="#step-interaction">
         <span class="step">2</span>
-        <h3>Interact</h3>
-        <p>A grasp interface and six atomic interactions turn the decision into robot motion.</p>
+        <h3>Interaction</h3>
+        <p>A grasp interface and six atomic interactions turn the decision into robot actions on the object.</p>
       </a>
       <div class="loop-arrow" aria-hidden="true"></div>
-      <a class="loop-node n-fb" href="#step-sense">
+      <a class="loop-node n-fb" href="#step-feedback">
         <span class="step">3</span>
-        <h3>Sense</h3>
-        <p>Vision, audio, touch and force are recorded, encoded and returned for the next decision.</p>
+        <h3>Feedback</h3>
+        <p>Vision, audio, touch and force feedback is collected and returned to the LLM for the next round of reasoning.</p>
       </a>
       <svg class="loop-back" viewBox="0 0 1000 46" preserveAspectRatio="none" aria-hidden="true">
         <path d="M930 2 V26 Q930 40 916 40 H84 Q70 40 70 26 V6" />
@@ -240,9 +240,9 @@
       <figcaption>Given an initial scene and an instruction, the LLM names the target object, interaction and modality. The interface executes and returns visual, audio, tactile and force feedback.</figcaption>
     </figure>
 
-    <!-- 1 · Reason -->
-    <div class="stage" id="step-reason" style="--c: var(--blue)">
-      <header class="stage-head reveal"><span class="step">1</span><div><h3>Reason</h3><p>ROMA-7B, built on Qwen2.5-Omni, learns to judge sufficiency and choose what to sense next.</p></div></header>
+    <!-- 1 · Reasoning -->
+    <div class="stage" id="step-reasoning" style="--c: var(--blue)">
+      <header class="stage-head reveal"><span class="step">1</span><div><h3>Reasoning</h3><p>ROMA-7B, built on Qwen2.5-Omni, learns to judge sufficiency and choose what to sense next.</p></div></header>
       <div class="method-grid three">
         <article class="card reveal">
           <span class="num">Tokens</span>
@@ -270,14 +270,15 @@
       </div>
     </div>
 
-    <!-- 2 · Interact -->
-    <div class="stage" id="step-interact" style="--c: var(--orange)">
-      <header class="stage-head reveal"><span class="step">2</span><div><h3>Interact</h3><p>A training-free grasp policy plus six pre-defined interactions form the interface between the LLM and the robot.</p></div></header>
+    <!-- 2 · Interaction -->
+    <div class="stage" id="step-interaction" style="--c: var(--orange)">
+      <header class="stage-head reveal"><span class="step">2</span><div><h3>Interaction</h3><p>The physical interface has two parts: a grasp interface that secures the object, and six atomic interactions that probe it.</p></div></header>
       <div class="interact-grid">
         <article class="card reveal">
           <span class="num">Grasp interface</span>
           <h3>Stable contact for sensing</h3>
           <p>AnyGrasp proposes grasps from the object&rsquo;s point cloud. A symmetry-based completion recovers geometry that transparent and reflective objects lose, then candidates are filtered by height, reachability and orientation, and refined for our gripper.</p>
+          <figure class="card-fig"><img src="assest/grasp.png" alt="Object point cloud with completed points and the object, workspace and search cuboids" width="3288" height="1777" loading="lazy"><figcaption>Point-cloud completion and grasp enhancement: completed points (purple) and the object, workspace and search cuboids around an object.</figcaption></figure>
         </article>
         <div class="panel reveal">
           <p class="panel-label">Six atomic interactions</p>
@@ -293,16 +294,16 @@
       </div>
     </div>
 
-    <!-- 3 · Sense -->
-    <div class="stage" id="step-sense" style="--c: var(--green)">
-      <header class="stage-head reveal"><span class="step">3</span><div><h3>Sense</h3><p>Every interaction is recorded by four modalities; the model chooses which of them to read.</p></div></header>
+    <!-- 3 · Feedback -->
+    <div class="stage" id="step-feedback" style="--c: var(--green)">
+      <header class="stage-head reveal"><span class="step">3</span><div><h3>Feedback</h3><p>Every interaction is recorded by four sensory modalities; the model chooses which of them to read.</p></div></header>
       <div class="mod-grid">
-        <article class="mod-card m-vision reveal"><h4>Vision</h4><p>One wrist-camera image per interaction; the initial scene comes from RGB-D views.</p></article>
-        <article class="mod-card m-audio reveal"><h4>Audio</h4><p>One cropped microphone segment, most informative for <code>&lt;shake&gt;</code> and <code>&lt;rotate&gt;</code>.</p></article>
-        <article class="mod-card m-touch reveal"><h4>Touch</h4><p>Two GelSight Mini images, one at the start and one during the interaction.</p></article>
-        <article class="mod-card m-force reveal"><h4>Force</h4><p>A wrist force sensor. The mean gravity component is given to the LLM as text.</p></article>
+        <article class="mod-card m-vision reveal"><img src="assest/vision.png" alt="Wrist-camera image during an interaction" width="640" height="480" loading="lazy"><h4>Vision</h4><p>One wrist-camera image per interaction, showing the object&rsquo;s appearance and how it deforms or moves.</p></article>
+        <article class="mod-card m-audio reveal"><img src="assest/audio.png" alt="Audio spectrogram of an interaction" width="748" height="563" loading="lazy"><h4>Audio</h4><p>One cropped microphone segment of the sound the interaction makes: the rattle of contents inside, or the impact sound of the material.</p></article>
+        <article class="mod-card m-touch reveal"><img src="assest/tactile.png" alt="GelSight tactile image" width="320" height="240" loading="lazy"><h4>Touch</h4><p>Two GelSight Mini images, one at the start and one during the interaction, showing local hardness, roughness and texture at the contact.</p></article>
+        <article class="mod-card m-force reveal"><img src="assest/force.png" alt="Force versus time during shaking" width="640" height="480" loading="lazy"><h4>Force</h4><p>A wrist force sensor. The mean gravity component during the interaction is given to the LLM as text, a cue for weight.</p></article>
       </div>
-      <p class="eq-line reveal">Raw force is moved to the robot base frame and the empty-gripper force is removed:
+      <p class="eq-line reveal">Force is moved to the robot base frame and the empty-gripper force is removed:
         <span class="eq">F<sub>trans</sub> = R<sub>B&larr;G</sub> R<sub>G&larr;S</sub> (F<sub>raw</sub> &minus; F<sub>raw</sub><sup>0</sup>)</span></p>
     </div>
   </div>
@@ -312,8 +313,8 @@
 <section class="section tint" id="bench">
   <div class="wrap">
     <header class="sec-head">
-      <p class="eyebrow"><i></i>ROMA Bench</p>
-      <h2>Perception chains</h2>
+      <p class="eyebrow"><i></i>Benchmark</p>
+      <h2>ROMA Bench: Active Perception as Perception Chains</h2>
       <p class="lead">Active perception unfolds as a chain: each interaction gives new evidence that shapes the next one. ROMA Bench holds 2,100 scene-level tasks from the tabletop test split, in three flavors.</p>
     </header>
 
@@ -324,69 +325,70 @@
       </defs>
     </svg>
     <div class="chains">
-      <article class="chain reveal">
+      <article class="chain c-single reveal">
         <span class="tag c-blue">Single-chain</span>
         <p class="q">&ldquo;Which objects are empty?&rdquo;</p>
-        <svg class="chain-svg" viewBox="0 0 300 132" role="img" aria-label="One question, one chain: Empty? then shake with audio, then answer">
-          <rect class="k" x="8" y="52" width="62" height="28" rx="8"/><text class="t" x="39" y="70" text-anchor="middle">Empty?</text>
-          <path class="ln" d="M70 66 H90" marker-end="url(#ah)"/>
-          <rect class="k act" x="92" y="52" width="84" height="28" rx="8"/><text class="t" x="124" y="70" text-anchor="middle">shake</text>
-          <circle class="bd a" cx="158" cy="66" r="8"/><text class="bt" x="158" y="69.2" text-anchor="middle">A</text>
-          <path class="ln" d="M176 66 H196" marker-end="url(#ah)"/>
-          <rect class="k ans" x="198" y="52" width="72" height="28" rx="8"/><text class="t w" x="234" y="70" text-anchor="middle">Answer</text>
+        <svg class="chain-svg" viewBox="0 0 230 130" role="img" aria-label="One question, one chain: Empty? then shake with audio, then answer">
+          <rect class="k" x="6" y="51" width="56" height="28" rx="8"/><text class="t" x="34" y="69" text-anchor="middle">Empty?</text>
+          <path class="ln" d="M62 65 H76" marker-end="url(#ah)"/>
+          <rect class="k act" x="78" y="51" width="73" height="28" rx="8"/><text class="t" x="87" y="69">shake</text>
+          <circle class="bd a" cx="134" cy="65" r="8"/><text class="bt" x="134" y="68.2" text-anchor="middle">A</text>
+          <path class="ln" d="M151 65 H161" marker-end="url(#ah)"/>
+          <rect class="k ans" x="163" y="51" width="58" height="28" rx="8"/><text class="t w" x="192" y="69" text-anchor="middle">Answer</text>
         </svg>
         <p>One target attribute, one chain of interactions.</p>
       </article>
-      <article class="chain reveal">
+      <article class="chain c-multi reveal">
         <span class="tag c-orange">Multi-chain</span>
         <p class="q">&ldquo;Is the heaviest object also empty?&rdquo;</p>
-        <svg class="chain-svg" viewBox="0 0 300 132" role="img" aria-label="Two chains: Heavy? then lift with force, and Empty? then shake with audio plus force reused from lift">
-          <rect class="k" x="8" y="20" width="58" height="28" rx="8"/><text class="t" x="37" y="38" text-anchor="middle">Heavy?</text>
-          <path class="ln" d="M66 34 H86" marker-end="url(#ah)"/>
-          <rect class="k act" x="88" y="20" width="66" height="28" rx="8"/><text class="t" x="108" y="38" text-anchor="middle">lift</text>
-          <circle class="bd f" cx="139" cy="34" r="8"/><text class="bt" x="139" y="37.2" text-anchor="middle">F</text>
-          <path class="ln" d="M154 34 H236" marker-end="url(#ah)"/>
-          <rect class="k ans" x="238" y="20" width="54" height="28" rx="8"/><text class="t w" x="265" y="38" text-anchor="middle">Answer</text>
+        <svg class="chain-svg" viewBox="0 0 320 130" role="img" aria-label="Two chains: Heavy? then lift with force, and Empty? then shake with audio plus force reused from lift, both leading to one answer">
+          <rect class="k" x="6" y="20" width="56" height="28" rx="8"/><text class="t" x="34" y="38" text-anchor="middle">Heavy?</text>
+          <path class="ln" d="M62 34 H76" marker-end="url(#ah)"/>
+          <rect class="k act" x="78" y="20" width="56" height="28" rx="8"/><text class="t" x="87" y="38">lift</text>
+          <circle class="bd f" cx="117" cy="34" r="8"/><text class="bt" x="117" y="37.2" text-anchor="middle">F</text>
+          <path class="ln" d="M134 34 H244 C250 34 252 54 256 59" marker-end="url(#ah)"/>
 
-          <rect class="k" x="8" y="84" width="58" height="28" rx="8"/><text class="t" x="37" y="102" text-anchor="middle">Empty?</text>
-          <path class="ln" d="M66 98 H86" marker-end="url(#ah)"/>
-          <rect class="k act" x="88" y="84" width="66" height="28" rx="8"/><text class="t" x="108" y="102" text-anchor="middle">shake</text>
-          <circle class="bd a" cx="139" cy="98" r="8"/><text class="bt" x="139" y="101.2" text-anchor="middle">A</text>
-          <path class="ln" d="M154 98 H168" marker-end="url(#ah)"/>
-          <rect class="k reuse" x="170" y="84" width="56" height="28" rx="8"/>
-          <circle class="bd f" cx="185" cy="98" r="8"/><text class="bt" x="185" y="101.2" text-anchor="middle">F</text>
-          <text class="t p" x="209" y="102" text-anchor="middle">reuse</text>
-          <path class="ln" d="M226 98 H236" marker-end="url(#ah)"/>
-          <rect class="k ans" x="238" y="84" width="54" height="28" rx="8"/><text class="t w" x="265" y="102" text-anchor="middle">Answer</text>
+          <rect class="k" x="6" y="82" width="56" height="28" rx="8"/><text class="t" x="34" y="100" text-anchor="middle">Empty?</text>
+          <path class="ln" d="M62 96 H76" marker-end="url(#ah)"/>
+          <rect class="k act" x="78" y="82" width="73" height="28" rx="8"/><text class="t" x="87" y="100">shake</text>
+          <circle class="bd a" cx="134" cy="96" r="8"/><text class="bt" x="134" y="99.2" text-anchor="middle">A</text>
+          <path class="ln" d="M151 96 H163" marker-end="url(#ah)"/>
+          <rect class="k reuse" x="165" y="82" width="72" height="28" rx="8"/>
+          <circle class="bd f" cx="182" cy="96" r="8"/><text class="bt" x="182" y="99.2" text-anchor="middle">F</text>
+          <text class="t p" x="196" y="100">reuse</text>
+          <path class="ln" d="M237 96 H244 C250 96 252 76 256 71" marker-end="url(#ah)"/>
 
-          <path class="ln reuse-ln" d="M121 48 C121 72 198 62 198 82" marker-end="url(#ahp)"/>
+          <rect class="k ans" x="258" y="51" width="58" height="28" rx="8"/><text class="t w" x="287" y="69" text-anchor="middle">Answer</text>
+          <path class="ln reuse-ln" d="M106 48 C106 72 201 58 201 80" marker-end="url(#ahp)"/>
         </svg>
         <p>Several attributes. Chains share feedback, so redundant interactions should be skipped.</p>
       </article>
-      <article class="chain reveal">
+      <article class="chain c-intent reveal">
         <span class="tag c-green">Intent-driven</span>
         <p class="q">&ldquo;Find me a treat to eat.&rdquo;</p>
-        <svg class="chain-svg" viewBox="0 0 300 132" role="img" aria-label="An instruction is analyzed into two chains, Heavy? with lift and Empty? with shake, sharing force feedback, leading to one answer">
-          <rect class="k intent" x="6" y="52" width="70" height="28" rx="8"/><text class="t" x="41" y="70" text-anchor="middle">Instruction</text>
-          <path class="ln" d="M76 66 C86 66 86 34 96 34" marker-end="url(#ah)"/>
-          <path class="ln" d="M76 66 C86 66 86 98 96 98" marker-end="url(#ah)"/>
+        <svg class="chain-svg" viewBox="0 0 410 130" role="img" aria-label="An instruction is analyzed into two chains, Heavy? with lift and Empty? with shake plus force reused from lift, both leading to one answer">
+          <rect class="k intent" x="4" y="51" width="76" height="28" rx="8"/><text class="t" x="42" y="69" text-anchor="middle">Instruction</text>
+          <path class="ln" d="M80 65 C90 65 90 34 96 34" marker-end="url(#ah)"/>
+          <path class="ln" d="M80 65 C90 65 90 96 96 96" marker-end="url(#ah)"/>
 
-          <rect class="k" x="98" y="20" width="52" height="28" rx="8"/><text class="t" x="124" y="38" text-anchor="middle">Heavy?</text>
-          <path class="ln" d="M150 34 H160" marker-end="url(#ah)"/>
-          <rect class="k act" x="162" y="20" width="62" height="28" rx="8"/><text class="t" x="178" y="38" text-anchor="middle">lift</text>
-          <circle class="bd f" cx="208" cy="34" r="8"/><text class="bt" x="208" y="37.2" text-anchor="middle">F</text>
+          <rect class="k" x="98" y="20" width="56" height="28" rx="8"/><text class="t" x="126" y="38" text-anchor="middle">Heavy?</text>
+          <path class="ln" d="M154 34 H168" marker-end="url(#ah)"/>
+          <rect class="k act" x="170" y="20" width="56" height="28" rx="8"/><text class="t" x="179" y="38">lift</text>
+          <circle class="bd f" cx="209" cy="34" r="8"/><text class="bt" x="209" y="37.2" text-anchor="middle">F</text>
+          <path class="ln" d="M226 34 H336 C342 34 344 54 348 59" marker-end="url(#ah)"/>
 
-          <rect class="k" x="98" y="84" width="52" height="28" rx="8"/><text class="t" x="124" y="102" text-anchor="middle">Empty?</text>
-          <path class="ln" d="M150 98 H160" marker-end="url(#ah)"/>
-          <rect class="k act" x="162" y="84" width="62" height="28" rx="8"/><text class="t" x="178" y="102" text-anchor="middle">shake</text>
-          <circle class="bd a" cx="208" cy="98" r="8"/><text class="bt" x="208" y="101.2" text-anchor="middle">A</text>
+          <rect class="k" x="98" y="82" width="56" height="28" rx="8"/><text class="t" x="126" y="100" text-anchor="middle">Empty?</text>
+          <path class="ln" d="M154 96 H168" marker-end="url(#ah)"/>
+          <rect class="k act" x="170" y="82" width="73" height="28" rx="8"/><text class="t" x="179" y="100">shake</text>
+          <circle class="bd a" cx="226" cy="96" r="8"/><text class="bt" x="226" y="99.2" text-anchor="middle">A</text>
+          <path class="ln" d="M243 96 H255" marker-end="url(#ah)"/>
+          <rect class="k reuse" x="257" y="82" width="72" height="28" rx="8"/>
+          <circle class="bd f" cx="274" cy="96" r="8"/><text class="bt" x="274" y="99.2" text-anchor="middle">F</text>
+          <text class="t p" x="288" y="100">reuse</text>
+          <path class="ln" d="M329 96 H336 C342 96 344 76 348 71" marker-end="url(#ah)"/>
 
-          <path class="ln reuse-ln" d="M193 48 V82" marker-end="url(#ahp)"/>
-          <text class="t p" x="187" y="70" text-anchor="end">reuse</text>
-
-          <path class="ln" d="M224 34 C236 34 236 58 244 60" marker-end="url(#ah)"/>
-          <path class="ln" d="M224 98 C236 98 236 74 244 72" marker-end="url(#ah)"/>
-          <rect class="k ans" x="246" y="52" width="48" height="28" rx="8"/><text class="t w" x="270" y="70" text-anchor="middle">Answer</text>
+          <rect class="k ans" x="350" y="51" width="58" height="28" rx="8"/><text class="t w" x="379" y="69" text-anchor="middle">Answer</text>
+          <path class="ln reuse-ln" d="M198 48 C198 72 293 58 293 80" marker-end="url(#ahp)"/>
         </svg>
         <p>The model infers which attributes matter from an implicit goal, then chains them.</p>
       </article>
@@ -399,9 +401,11 @@
         <p class="chart-title spaced">Question formats</p>
         <ul class="chips neutral"><li>Multiple choice</li><li>True or false</li><li>Ranking</li></ul>
         <ul class="facts">
-          <li><b>100</b> held-out scenes with <b>56</b> unseen objects</li>
-          <li><b>132</b> free-form tasks re-created in 8 real scenes</li>
-          <li>Intent-driven questions written from scene annotations</li>
+          <li><b>Test split</b><span>100 held-out tabletop scenes, 2,100 tasks</span></li>
+          <li><b>Unseen objects</b><span>56 objects, disjoint from the training and handheld data</span></li>
+          <li><b>Intent-driven questions</b><span>written by GPT-5.4 from the scene annotations</span></li>
+          <li><b>Success criterion</b><span>the predicted grasp box must overlap a ground-truth object by at least 70%</span></li>
+          <li><b>Real-robot subset</b><span>8 re-created scenes, 132 free-form tasks</span></li>
         </ul>
       </div>
       <div class="panel reveal">
@@ -411,7 +415,6 @@
       </div>
     </div>
 
-    <p class="fine reveal">A predicted grasp box must overlap a ground-truth object by at least 70%, otherwise the task fails. All test objects are disjoint from the training and handheld data.</p>
   </div>
 </section>
 
@@ -441,10 +444,9 @@
     </div>
 
     <div class="wins">
-      <div class="win reveal"><b>91.5</b><span>weight, single-chain<br>(force + lift)</span></div>
-      <div class="win reveal"><b>81.0</b><span>texture, single-chain<br>(touch)</span></div>
-      <div class="win reveal"><b>+24.2</b><span>multi-chain, over the<br>best baseline</span></div>
-      <div class="win reveal"><b>61.4</b><span>real robot, free-form,<br>vs 41.7 best baseline</span></div>
+      <div class="win reveal"><b>+24.2</b><span>Multi-chain<br>over the best baseline</span></div>
+      <div class="win reveal"><b>+13.7</b><span>Intent-driven<br>over the best baseline</span></div>
+      <div class="win reveal"><b>+19.7</b><span>Real robot<br>over the best baseline</span></div>
     </div>
   </div>
 </section>
@@ -486,9 +488,16 @@
     </div>
 
     <h3 class="sub-h reveal">A case study</h3>
-    <div class="case-q reveal">
-      <p><b>Question:</b> Which of the three rightmost objects are empty?</p>
-      <p><b>GT:</b> the white box</p>
+    <div class="case-intro reveal">
+      <figure class="case-scene">
+        <img src="assest/case.png" alt="Initial scene: a plush pig, a metal tin, and three objects on the right: a white box, a grey cube and a black box" width="1280" height="720" loading="lazy">
+        <i style="left:57%; top:11%">white box</i><i style="left:68%; top:31%">grey cube</i><i style="left:86%; top:14%">black box</i>
+        <figcaption>Initial scene</figcaption>
+      </figure>
+      <div class="case-q">
+        <p><b>Question</b>Which of the three rightmost objects are empty?</p>
+        <p><b>GT</b>the white box</p>
+      </div>
     </div>
     <div class="cases">
       <article class="case bad reveal">

@@ -353,10 +353,10 @@
    * Results (paper Tabs. 1, 2, 7)
    * ------------------------------------------------------------------ */
   const MODELS = [
-    { key: 'gpt', name: 'GPT-5.4', color: '#aab3c5' },
-    { key: 'gem', name: 'Gemini 3.5 Flash', color: '#7d8aa3' },
-    { key: 'q25', name: 'Qwen 2.5-Omni', color: '#d3d8e2' },
-    { key: 'q3', name: 'Qwen 3-Omni', color: '#bcc4d2' },
+    { key: 'gpt', name: 'GPT-5.4', color: '#12a3b8' },
+    { key: 'gem', name: 'Gemini 3.5 Flash', color: '#e0527a' },
+    { key: 'q25', name: 'Qwen 2.5-Omni', color: '#e9b12c' },
+    { key: 'q3', name: 'Qwen 3-Omni', color: '#3fa46a' },
     { key: 'roma', name: 'ROMA-7B', color: null },
   ];
   const GROUPS = ['Single-chain', 'Multi-chain', 'Intent-driven', 'Total'];
@@ -469,8 +469,8 @@
         s('path', { d: 'M0,0 L10,5 L0,10 z', fill: '#9aa3b5' }))));
       svg.append(s('text', { x: (X(5.4) + ex) / 2, y: by - 8, 'text-anchor': 'middle', style: 'font-weight:700;fill:#33415a', text: '≈ 4× more interactions' }));
       const pts = [
-        { n: 'GPT-5.4', x: 1.20, y: 63.3, fill: '#aab3c5' },
-        { n: 'Gemini 3.5 Flash', x: 2.77, y: 68.8, fill: '#7d8aa3' },
+        { n: 'GPT-5.4', x: 1.20, y: 63.3, fill: '#12a3b8' },
+        { n: 'Gemini 3.5 Flash', x: 2.77, y: 68.8, fill: '#e0527a' },
         { n: 'ROMA-7B', x: 5.40, y: 76.0, fill: 'url(#romaGrad)', big: true },
       ];
       pts.forEach((p) => {
