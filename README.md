@@ -92,7 +92,7 @@ The ROMA-7B checkpoint directory (`ROMA-Qwen2.5-Omni-7B`) is expected to contain
 ROMA-Qwen2.5-Omni-7B/
 ├── xxx.safetensors     # base Qwen2.5-Omni-7B model
 ├── anytouch2.pth        # tactile encoder
-├── audio.pth            # fine-tuned audio adapter and encoder
+├── audio.bin            # fine-tuned audio adapter and encoder
 ├── tactile.bin          # fine-tuned tactile adapter
 └── ROMA-LLM.bin         # ROMA LLM weights
 ```
