@@ -1,4 +1,10 @@
+<p align="center">
+  <img src="assest/logo.png" width="200" alt="ROMA logo">
+</p>
+
 <h1 align="center">ROMA: LLM System for Real-World Object-Centric<br>Multi-Sensory Active Perception</h1>
+
+<h3 align="center"><em>I saw. I touched. I understood.</em></h3>
 
 <p align="center">
   <a href="https://gewu-lab.github.io/ROMA/"><img src="https://img.shields.io/badge/Project-Page-blue" alt="Project Page"></a>
@@ -18,10 +24,10 @@
 ## Introduction
 
 <p align="center">
-  <img src="teaser.png" width="90%" alt="ROMA: LLM-based system for Real-World Object-Centric Multi-Sensory Active Perception">
+  <img src="assest/teaser.png" width="90%" alt="ROMA: LLM-based system for Real-World Object-Centric Multi-Sensory Active Perception">
 </p>
 
-*I saw. I touched. I understood.* Humans build an understanding of the physical world through an active process: when sensory evidence is insufficient, we decide **what** information is missing, **how** to acquire it, and **when** enough evidence has been obtained. Existing multi-sensory robot systems, in contrast, mostly integrate whatever sensory inputs they are given.
+Humans build an understanding of the physical world through an active process: when sensory evidence is insufficient, we decide **what** information is missing, **how** to acquire it, and **when** enough evidence has been obtained. Existing multi-sensory robot systems, in contrast, mostly integrate whatever sensory inputs they are given.
 
 **ROMA** is an LLM-based system for **R**eal-World **O**bject-Centric **M**ulti-Sensory **A**ctive Perception. It integrates vision, audio, touch, and force into a *reasoning-interaction-feedback* loop: the LLM identifies the missing evidence and selects the target object, the interaction (`lift`, `press`, `collide`, `shake`, `rotate`, `squeeze`), and the sensory modalities, while a physical interface executes the interaction and returns the multi-sensory feedback.
 
@@ -47,7 +53,7 @@ Task success rate (%). See the paper for the full results.
 ## Demo
 
 <p align="center">
-  <img src="demo.png" width="90%" alt="ROMA web demo">
+  <img src="assest/demo.png" width="90%" alt="ROMA web demo">
 </p>
 
 The demo runs locally. Given the initial scene image and a question, ROMA reasons step by step; whenever it emits an action token, the corresponding recorded feedback (wrist image, tactile images, contact sound, gravity force) is loaded from `resources/example_data/1` and fed back to the model, and generation continues until it answers. Everything is streamed to the page:
