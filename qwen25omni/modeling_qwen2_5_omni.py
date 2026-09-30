@@ -1762,7 +1762,7 @@ class Qwen2_5OmniThinkerForConditionalGeneration(Qwen2_5OmniPreTrainedModelForCo
         self.lm_head = nn.Linear(config.text_config.hidden_size, config.text_config.vocab_size, bias=False)
         self.spatial_merge_size = config.vision_config.spatial_merge_size
         self.rope_deltas = None
-        tactile_config = AutoConfig.from_pretrained('/share/project/robocoin/frx/CLIP-B-16/config.json')
+        tactile_config = AutoConfig.from_pretrained('/root/ROMA-Qwen2.5-Omni-7B/config-anytouch2.json')
         self.tactile_tower = TactileVideoMAE(2, tactile_config, 2, 1)
         self.tactile_proj = nn.Linear(tactile_config.vision_config.hidden_size, config.audio_config.output_dim)
         self.post_init()

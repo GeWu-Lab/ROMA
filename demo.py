@@ -2,7 +2,10 @@ import os
 import argparse
 
 parser = argparse.ArgumentParser(description="ROMA active-perception web demo")
-parser.add_argument('--model_path', default='/share/project/robocoin/frx/ROMA-7B', help='Merged ROMA-7B checkpoint directory.')
+parser.add_argument(
+    '--model_path', default='/root/ROMA-Qwen2.5-Omni-7B',
+    help='ROMA-Qwen2.5-Omni-7B directory containing Qwen2.5-Omni-7B/, anytouch2.pth, audio.pth, tactile.bin and ROMA-LLM.bin.',
+)
 parser.add_argument('--gpu', type=int, default=0, help='CUDA device id to bind this process to (default: leave CUDA_VISIBLE_DEVICES untouched).')
 parser.add_argument('--host', default='0.0.0.0')
 parser.add_argument('--port', type=int, default=7860)
@@ -11,6 +14,7 @@ cli_args = parser.parse_args()
 if cli_args.gpu is not None:
     os.environ['CUDA_VISIBLE_DEVICES'] = str(cli_args.gpu)
 
+import copy
 import csv
 import html
 import inspect
@@ -27,6 +31,7 @@ from transformers import StoppingCriteria, StoppingCriteriaList, TextIteratorStr
 from my_qwen_omni_utils import process_mm_info
 from qwen25omni.modeling_qwen2_5_omni import Qwen2_5OmniForConditionalGeneration
 from qwen25omni.processing_qwen2_5_omni import Qwen2_5OmniProcessor
+from utils.util import smart_tokenizer_and_embedding_resize_with_init
 
 # ============================================================
 # Single-QA web version of the active-perception loop in eval.py:
@@ -66,18 +71,20 @@ SYS_PROMPT = (
     "perception, reasoning, and interaction. If the available observations are sufficient, answer the "
     "user's question directly. Otherwise, decide which modality or combination of modalities is needed "
     "for the task before actions, and interact with the environment to acquire the missing information. "
-    "The available actions are: <lift>, <squeeze>, <shake>, <rotate>, <collide>, and <press>. "
-    "You should specify the modalities you want to use for that action by using (use modality) before the action token."
-    "You must grasp an object before performing any action on it by generating <grasp_start> object name at (x1,y1,x2,y2) <grasp_end> with the bounding box of the object. "
+    # "The available actions are: <lift>, <squeeze>, <shake>, <rotate>, <collide>, and <press>. "
+    # "You should specify the modalities you want to use for that action by using (use modality) before the action token."
+    # "You must grasp an object before performing any action on it by generating <grasp_start> object name at (x1,y1,x2,y2) <grasp_end> with the bounding box of the object. "
     "Reason step by step with a chain of modality. If options are provided, "
     "you should choose the option(s) that is most likely to be the answer."
 )
 
-SPECIAL_TOKENS = [
-    '<|tactile_bos|>', '<|tactile_eos|>', '<|TACTILE|>',
-    '<grasp_start>', '<grasp_end>', '<lift>', '<collide>', '<press>',
-    '<rotate>', '<squeeze>', '<shake>', '<force_start>', '<force_end>',
-]
+# New special tokens (added in this order) and the words whose embeddings initialize them
+SPECIAL_TOKEN_INIT_WORDS = {
+    '<|tactile_bos|>': 'tactile start', '<|tactile_eos|>': 'tactile end', '<|TACTILE|>': 'tactile',
+    '<grasp_start>': 'grasp start', '<grasp_end>': 'grasp end', '<lift>': 'lift', '<collide>': 'collide',
+    '<press>': 'press', '<rotate>': 'rotate', '<squeeze>': 'squeeze', '<shake>': 'shake',
+    '<force_start>': 'gravity force start', '<force_end>': 'gravity force end',
+}
 
 CHAT_TEMPLATE = "{% set audio_count = namespace(value=0) %}{% set image_count = namespace(value=0) %}{% set video_count = namespace(value=0) %}{% set tactile_count = namespace(value=0) %}{% for message in messages %}{% if loop.first and message['role'] != 'system' %}<|im_start|>system\nYou are a helpful assistant.<|im_end|>\n{% endif %}<|im_start|>{{ message['role'] }}\n{% if message['content'] is string %}{{ message['content'] }}<|im_end|>\n{% else %}{% for content in message['content'] %}{% if content['type'] == 'image' or 'image' in content or 'image_url' in content %}{% set image_count.value = image_count.value + 1 %}{% if add_vision_id %}Picture {{ image_count.value }}: {% endif %}<|vision_bos|><|IMAGE|><|vision_eos|>{% elif content['type'] == 'audio' or 'audio' in content or 'audio_url' in content %}{% set audio_count.value = audio_count.value + 1 %}{% if add_audio_id %}Audio {{ audio_count.value }}: {% endif %}<|audio_bos|><|AUDIO|><|audio_eos|>{% elif content['type'] == 'tactile' or 'tactile' in content %}{% set tactile_count.value = tactile_count.value + 1 %}{% if add_audio_id %}Tactile {{ tactile_count.value }}: {% endif %}<|tactile_bos|><|TACTILE|><|tactile_eos|>{% elif content['type'] == 'video' or 'video' in content %}{% set video_count.value = video_count.value + 1 %}{% if add_vision_id %}Video {{ video_count.value }}: {% endif %}<|vision_bos|><|VIDEO|><|vision_eos|>{% elif 'text' in content %}{{ content['text'] }}{% endif %}{% endfor %}<|im_end|>\n{% endif %}{% endfor %}{% if add_generation_prompt %}<|im_start|>assistant\n{% endif %}"
 
@@ -281,31 +288,65 @@ class Run:
         self.status = "running"  # running / done / stopped / error
 
 
+def load_anytouch(ckpt, tactile_tower):
+    """Load the pretrained AnyTouch encoder weights into the thinker's tactile tower (same as eval.py)."""
+    new_ckpt = {}
+    for key, item in ckpt.items():
+        if "touch_mae_model" in key and 'decoder' not in key and 'mask_token' not in key:
+            new_ckpt[key.replace('touch_mae_model.', '')] = copy.deepcopy(item)
+
+    for k, v in tactile_tower.named_parameters():
+        if k not in new_ckpt:
+            new_ckpt[k] = v.detach().cpu()
+
+    tactile_tower.load_state_dict(new_ckpt, strict=True)
+    return tactile_tower
+
+
+def load_finetune_weights(thinker, path, name):
+    """Overlay a finetune_weights.bin (partial state dict) onto the thinker (same as eval.py)."""
+    ckpt = torch.load(path, map_location='cpu')
+    for n, p in thinker.named_parameters():
+        if n not in ckpt:
+            ckpt[n] = p.data
+        else:
+            print(f"Loading {n} from {name} checkpoint.")
+    thinker.load_state_dict(ckpt, strict=False)
+
+
 class RomaEngine:
-    def __init__(self, model_path):
+    def __init__(self, roma_dir):
+        # Base Qwen2.5-Omni first, then the tactile encoder / new tokens / audio adapter / tactile adapter / LLM, as in eval.py
+        base_path = roma_dir
         self.model = Qwen2_5OmniForConditionalGeneration.from_pretrained(
-            model_path,
+            base_path,
             torch_dtype=torch.bfloat16,
             device_map="auto",
             # attn_implementation="flash_attention_2",
         )
         self.model.disable_talker()
-        self.model.eval()
-        print('model loaded!', torch.cuda.is_available())
 
-        self.processor = Qwen2_5OmniProcessor.from_pretrained(model_path)
+        tactile_ckpt = torch.load(os.path.join(roma_dir, "anytouch2.pth"), map_location='cpu')
+        self.model.thinker.tactile_tower = load_anytouch(tactile_ckpt, self.model.thinker.tactile_tower)
+
+        self.processor = Qwen2_5OmniProcessor.from_pretrained(base_path)
         self.tokenizer = self.processor.tokenizer
-        self.processor.chat_template = CHAT_TEMPLATE
-
-        # The merged checkpoint normally already carries these tokens; if the tokenizer lacks them, add them in training order.
-        vocab = self.tokenizer.get_vocab()
-        if any(t not in vocab for t in SPECIAL_TOKENS):
-            print("WARNING: special tokens missing from tokenizer, adding them.")
-            self.tokenizer.add_special_tokens({'additional_special_tokens': SPECIAL_TOKENS})
+        smart_tokenizer_and_embedding_resize_with_init(
+            {'additional_special_tokens': list(SPECIAL_TOKEN_INIT_WORDS)},
+            SPECIAL_TOKEN_INIT_WORDS, self.tokenizer, self.model.thinker,
+        )
 
         tactile_ids = self.tokenizer.convert_tokens_to_ids(['<|TACTILE|>', '<|tactile_bos|>', '<|tactile_eos|>'])
         for cfg in (self.model.config, self.model.thinker.config):
             cfg.tactile_token_id, cfg.tactile_start_token_id, cfg.tactile_end_token_id = tactile_ids
+        self.processor.chat_template = CHAT_TEMPLATE
+
+        load_finetune_weights(self.model.thinker, os.path.join(roma_dir, "audio.bin"), "audio adapter")
+        load_finetune_weights(self.model.thinker, os.path.join(roma_dir, "tactile.bin"), "tactile adapter")
+        load_finetune_weights(self.model.thinker, os.path.join(roma_dir, "ROMA-LLM.bin"), "ROMA LLM")
+
+        self.model.eval()
+        print('model loaded!', torch.cuda.is_available())
 
         self.action_id_to_name = {self.tokenizer.convert_tokens_to_ids(f'<{n}>'): n for n in ACTION_FOLDER_MAP}
         self.action_ids = set(self.action_id_to_name)
@@ -583,25 +624,33 @@ def render_trace(run):
 # ============================================================
 
 CSS = """
-.gradio-container { max-width: 1000px !important; margin: 0 auto !important; }
+.gradio-container { max-width: 1000px !important; margin: 0 auto !important;
+  --font: Calibri, "Segoe UI", Arial, sans-serif; --body-text-color: #000; --block-label-text-color: #000;
+  --block-title-text-color: #000; --block-info-text-color: #000; --body-text-color-subdued: #000;
+  --text-sm: 17px; --text-md: 20px; --text-lg: 23px; }
+.gradio-container button, .gradio-container textarea, .gradio-container input { font-size: 1.25rem !important; }
+.gradio-container, .gradio-container div, .gradio-container span, .gradio-container label,
+.gradio-container button, .gradio-container textarea, .gradio-container input, .gradio-container em,
+.gradio-container b { font-family: Calibri, "Segoe UI", Arial, sans-serif !important; font-weight: 700 !important; }
+.gradio-container textarea, .gradio-container input, .gradio-container label { color: #000 !important; }
 .roma-header { text-align: center; padding: 22px 0 6px; }
-.roma-title { font-size: 2.6rem; font-weight: 800; letter-spacing: .06em;
-  background: linear-gradient(90deg, #6366f1, #ec4899, #f59e0b); -webkit-background-clip: text;
-  background-clip: text; color: transparent; }
-.roma-sub { opacity: .7; margin-top: 4px; }
+.roma-sub { text-align: center; }
+.roma-title { font-size: 3.6rem; letter-spacing: .08em; line-height: 1.15; }
+.roma-tagline { margin-top: 4px; color: #000; font-size: 2rem; }
+.roma-sub { margin-top: 4px; color: #000; font-size: 1.2rem; }
 
 .roma-scene { max-width: 760px; margin: 8px auto 4px; border-radius: 18px; overflow: hidden;
   border: 1px solid var(--border-color-primary); box-shadow: 0 10px 34px rgba(0,0,0,.14);
   background: var(--background-fill-secondary); }
 .roma-scene-frame { position: relative; line-height: 0; overflow: hidden; }
 .roma-scene-frame img { width: 100%; display: block; }
-.roma-scene-cap { padding: 7px 14px; font-size: .85rem; opacity: .7; text-align: center; }
+.roma-scene-cap { padding: 8px 14px; font-size: 1.2rem; color: #000; text-align: center; }
 .roma-bbox { position: absolute; border: 2px solid #f43f5e; border-radius: 6px;
   box-shadow: 0 0 0 9999px rgba(0,0,0,.28); }
-.roma-bbox span { position: absolute; top: 0; left: 0; background: #f43f5e; color: #fff; font-size: 12px;
-  line-height: 1.5; padding: 0 7px; border-bottom-right-radius: 6px; }
+.roma-bbox span { position: absolute; top: 0; left: 0; background: #f43f5e; color: #fff; font-size: 16px;
+  line-height: 1.5; padding: 0 8px; border-bottom-right-radius: 6px; }
 
-.roma-empty { text-align: center; padding: 34px 20px; opacity: .6; border: 1px dashed var(--border-color-primary);
+.roma-empty { text-align: center; padding: 34px 20px; color: #000; font-size: 1.3rem; border: 1px dashed var(--border-color-primary);
   border-radius: 16px; }
 
 .roma-trace { position: relative; padding-left: 28px; margin-top: 6px; }
@@ -616,15 +665,17 @@ CSS = """
 .roma-step.err:before { background: #ef4444; box-shadow: 0 0 0 4px rgba(239,68,68,.2); }
 .roma-step.final { border-color: rgba(245,158,11,.6); }
 .roma-step.err { border-color: rgba(239,68,68,.6); }
-.roma-step-h { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; padding: 9px 14px; font-weight: 600;
+.roma-step-h { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; padding: 10px 14px; font-size: 1.3rem;
   border-bottom: 1px solid var(--border-color-primary); border-radius: 14px 14px 0 0;
   background: var(--background-fill-secondary); }
-.roma-step-b { padding: 12px 14px; white-space: pre-wrap; line-height: 1.7; word-break: break-word; }
+.roma-step-b { padding: 12px 14px; white-space: pre-wrap; line-height: 1.7; word-break: break-word;
+  font-size: 1.08rem; color: #000; }
+.roma-step-h { color: #000; }
 
 .chip { display: inline-flex; align-items: center; gap: 4px; padding: 0 10px; border-radius: 999px;
   font-size: .85em; font-weight: 600; margin: 0 2px; }
 .chip code { background: none; padding: 0; color: inherit; font-size: 1em; }
-.chip em { font-style: normal; opacity: .8; font-weight: 500; }
+.chip em { font-style: normal; }
 .chip-grasp { background: rgba(244,63,94,.14); color: #e11d48; }
 .chip-act { background: rgba(99,102,241,.16); color: #6366f1; }
 .chip-mod { background: rgba(16,185,129,.16); color: #059669; }
@@ -633,25 +684,28 @@ CSS = """
 .roma-tile { flex: 1 1 190px; max-width: 290px; min-width: 170px; }
 .roma-tile img { width: 100%; border-radius: 10px; display: block; border: 1px solid var(--border-color-primary); }
 .roma-tile audio { width: 100%; margin-top: 6px; }
-.roma-cap { font-size: .8rem; opacity: .75; margin-top: 5px; }
-.roma-force { padding: 16px 8px; text-align: center; font-size: 1.1rem; border-radius: 10px;
+.roma-cap { font-size: 1.15rem; color: #000; margin-top: 5px; }
+.roma-force { padding: 16px 8px; text-align: center; font-size: 1.4rem; border-radius: 10px;
   background: rgba(245,158,11,.12); }
-.roma-force b { font-size: 2rem; color: #d97706; }
+.roma-force b { font-size: 2.6rem; color: #d97706; }
 
 .roma-answer { margin-left: auto; background: linear-gradient(90deg, #f59e0b, #ef4444); color: #fff;
-  border-radius: 10px; padding: 1px 12px; font-weight: 700; }
+  border-radius: 10px; padding: 1px 14px; font-size: 1.15rem; }
 .roma-cursor { display: inline-block; width: 8px; height: 1.1em; margin-left: 2px; background: #6366f1;
   vertical-align: text-bottom; animation: roma-blink 1s steps(2) infinite; }
-.roma-status { display: flex; align-items: center; gap: 9px; opacity: .8; font-size: .9rem; padding: 2px 0 6px; }
-.roma-spin { width: 14px; height: 14px; border: 2px solid rgba(99,102,241,.25); border-top-color: #6366f1;
+.roma-status { display: flex; align-items: center; gap: 9px; color: #000; font-size: 1.3rem; padding: 2px 0 6px; }
+.roma-spin { width: 16px; height: 16px; border: 2px solid rgba(99,102,241,.25); border-top-color: #6366f1;
   border-radius: 50%; animation: roma-rot .8s linear infinite; }
 @keyframes roma-blink { 50% { opacity: 0; } }
 @keyframes roma-rot { to { transform: rotate(360deg); } }
 """
 
 HEADER = (
-    '<div class="roma-header"><div class="roma-title">ROMA</div>'
-    '<div class="roma-sub">Active multisensory perception · vision · touch · audio · force</div></div>'
+    '<div class="roma-header"><div class="roma-title">'
+    '<span style="color:#ef4444">R</span><span style="color:#f97316">O</span>'
+    '<span style="color:#3b82f6">M</span><span style="color:#22c55e">A</span></div>'
+    '<div class="roma-tagline">I saw · I touched · I understood</div>'
+    '<div class="roma-sub">Active Multisensory Perception System ROMA · 👁️ Vision · ✋ Touch · 🔊 Audio · ⚖️ Force</div></div>'
 )
 
 EXAMPLES = [
@@ -659,6 +713,15 @@ EXAMPLES = [
     "Is there anything inside the red box? If so, what is it?",
     "Which is heavier, the can or the green cup?",
     "Which objects are made of metal?",
+    "I am hungry.",
+    "Is there water?",
+    "Is the red box suitable to hold water?",
+    "My hands are damp. Pass me the item with the most slip-resistant grasping surface.",
+    "Find me an empty container for holding the used paintbrushes.",
+    "Which closed package should I tape shut so loose pieces do not scatter?",
+    "I'm about to pour water into the can. What should I do first?",
+    "Before I clear the table, which item belongs in the padded bin so it does not shatter?",
+    "The tablecloth keeps lifting in the breeze. Which single item will hold its corner down most firmly?"
 ]
 
 
@@ -685,7 +748,7 @@ def build_ui(engine):
         scene = gr.HTML(render_scene(None))
         with gr.Row(equal_height=True):
             question = gr.Textbox(
-                placeholder="Ask a question about the scene, e.g. “Which object is the softest?”",
+                placeholder="Issue an instruction about the scene, e.g. “Which object is the heaviest?”",
                 lines=2, max_lines=6, show_label=False, container=False, scale=6,
             )
             with gr.Column(scale=1, min_width=170):
