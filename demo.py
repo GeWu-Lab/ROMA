@@ -661,6 +661,8 @@ CSS = """
 .gradio-container textarea, .gradio-container input, .gradio-container label { color: #000 !important; }
 #roma-examples, #roma-examples * { font-family: "Source Sans Pro", ui-sans-serif, system-ui, sans-serif !important;
   font-weight: 600 !important; font-size: 15px !important; }
+#roma-examples { border: 2px solid #6b7280 !important; border-radius: 14px; padding: 10px 12px; }
+#roma-examples .gallery-item, #roma-examples td { border: 1.5px solid #6b7280 !important; border-radius: 10px; }
 .roma-header { text-align: center; padding: 22px 0 6px; }
 .roma-sub { text-align: center; }
 .roma-title { font-size: 3.6rem; letter-spacing: .08em; line-height: 1.15; }
