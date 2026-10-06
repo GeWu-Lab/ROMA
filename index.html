@@ -71,7 +71,7 @@
         <svg viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></svg>Paper<em>soon</em>
       </a>
       <a class="btn" href="https://github.com/GeWu-Lab/ROMA" target="_blank" rel="noopener">
-        <svg viewBox="0 0 24 24"><path d="m8 7-5 5 5 5M16 7l5 5-5 5M14 4l-4 16"/></svg>Code
+        <svg viewBox="0 0 24 24"><path d="m8 7-5 5 5 5M16 7l5 5-5 5M14 4l-4 16"/></svg>Code &amp; GUI Demo
       </a>
       <a class="btn" href="https://huggingface.co/datasets/GeWuLab/ROMA" target="_blank" rel="noopener">
         <svg viewBox="0 0 24 24"><ellipse cx="12" cy="5.5" rx="8" ry="3"/><path d="M4 5.5v6.5c0 1.7 3.6 3 8 3s8-1.3 8-3V5.5M4 12v6.5c0 1.7 3.6 3 8 3s8-1.3 8-3V12"/></svg>Dataset &amp; Checkpoint
@@ -113,13 +113,13 @@
   <div class="wrap">
     <header class="sec-head">
       <p class="eyebrow"><i></i>Overview</p>
-      <h2>From passive sensory integration to active evidence acquisition</h2>
+      <h2>From passive sensory integration to active perception through interaction</h2>
     </header>
 
     <div class="abstract-grid">
       <div class="abstract-text reveal">
-        <p>Humans understand the physical world through an <em>active</em> process. When sensory evidence is insufficient, we interact: we lift an object to feel its weight, or shake it to hear what is inside. Existing multi-sensory robot systems mostly <em>integrate</em> the inputs they are given, rather than <em>acquire</em> the evidence they are missing.</p>
-        <p><strong>ROMA</strong> is an LLM-based system that closes this gap. It integrates vision, audio, tactile and force sensing into a <em>reasoning&ndash;interaction&ndash;feedback</em> loop: the model identifies missing evidence and chooses the target object, interaction and modality, while a physical interface executes it and returns the multi-sensory feedback.</p>
+        <p>Humans understand the physical world through an <em>active</em> process. When sensory evidence is insufficient, we interact: we lift an object to feel its weight, or shake it to hear what is inside. However, existing multi-sensory robot systems mostly <em>integrate</em> the inputs they are given, rather than <em>actively acquire</em> the evidence they are missing.</p>
+        <p><strong>ROMA</strong> is an LLM-based system that closes this gap. It integrates vision, audio, tactile and force sensing into a <em>reasoning&ndash;interaction&ndash;feedback</em> loop: the model identifies missing information and chooses the target objects, interactions and modalities based on the instruction, while a physical interface executes it and returns the multi-sensory feedback.</p>
       </div>
       <ul class="three-asks reveal" aria-label="What ROMA decides">
         <li><b>What</b><span>information is missing?</span></li>
@@ -129,9 +129,9 @@
     </div>
 
     <ul class="stats reveal" aria-label="Key numbers">
-      <li><b data-count="2000" data-prefix="~">~2,000</b><span>everyday objects</span></li>
+      <li><b data-count="2000" data-prefix="~">~2,000</b><span>everyday objects and content combinations</span></li>
       <li><b data-count="6">6</b><span>atomic interactions</span></li>
-      <li><b data-count="4">4</b><span>sensory modalities</span></li>
+      <li><b data-count="4">4</b><span>sensory modalities<br>(vision, audio, touch, force)</span></li>
       <li><b data-count="2100">2,100</b><span>benchmark tasks</span></li>
       <li><b data-count="72.9" data-dec="1">72.9%</b><span>ROMA-7B success<br>(best baseline 53.0%)</span></li>
     </ul>
@@ -140,17 +140,17 @@
       <a class="contrib c-blue reveal" href="#data">
         <span class="tag">Dataset</span>
         <h3>ROMI-2K</h3>
-        <p>Real-world object&ndash;interaction data with synchronized vision, audio, touch and force, for handheld objects and robot tabletop scenes.</p>
+        <p>Real-world object-centric interaction data with synchronized vision, audio, touch and force modalities, for handheld objects and robot tabletop scenes.</p>
       </a>
       <a class="contrib c-orange reveal" href="#method">
         <span class="tag">System</span>
-        <h3>ROMA-7B</h3>
-        <p>A multi-sensory LLM trained in two stages, paired with a grasp-and-interact physical interface that runs on a real robot arm.</p>
+        <h3>ROMA System</h3>
+        <p>An LLM-based system with two parts: the multi-sensory LLM ROMA-7B, which decides what to sense, and a physical interface that executes the interactions and returns the feedback on a real robot arm.</p>
       </a>
       <a class="contrib c-green reveal" href="#bench">
         <span class="tag">Benchmark</span>
         <h3>ROMA Bench</h3>
-        <p>Perception chains for single-attribute, long-horizon multi-attribute and intent-driven active perception.</p>
+        <p>Perception chains for single-attribute, long-horizon multi-attribute and intent-driven multi-sensory active perception tasks.</p>
       </a>
     </div>
   </div>
@@ -161,22 +161,22 @@
   <div class="wrap">
     <header class="sec-head">
       <p class="eyebrow"><i></i>Dataset</p>
-      <h2>ROMI-2K: Object-Centric Multi-Sensory Interaction Dataset</h2>
-      <p class="lead">Existing datasets trade object diversity against interaction diversity. ROMI-2K covers nearly 2,000 everyday objects, each with six atomic interactions and synchronized multi-sensory feedback, collected two complementary ways.</p>
+      <h2>ROMI-2K: Real-World Multi-Sensory Object Interaction Dataset</h2>
+      <p class="lead">Existing datasets trade object diversity against interaction diversity. ROMI-2K covers nearly 2,000 everyday objects and content combinations, each with six atomic interactions and synchronized vision, audio, tactile and force feedback, collected two complementary ways.</p>
     </header>
 
     <div class="subsets">
       <article class="subset reveal">
         <span class="tag c-blue">Handheld collection</span>
         <h3>1,657 object&ndash;content combinations</h3>
-        <p>A modified multi-sensory UMI (Pika Sense with a microphone and two GelSight Mini sensors). Every object is handled at 3 grasp locations, and container contents are varied to capture diverse audio.</p>
+        <p>A modified multi-sensory UMI (Pika Sense with a microphone and two GelSight Mini sensors). Every object is handled at 3 grasp locations, and inside contents are varied to capture diverse feedback.</p>
         <ul class="chips"><li class="vision">Wrist + third view</li><li class="audio">Audio</li><li class="touch">Touch &times; 2</li></ul>
       </article>
       <article class="subset reveal">
         <span class="tag c-purple">Tabletop scenes</span>
         <h3>500 scenes, 1&ndash;5 objects each</h3>
-        <p>An xArm 6 with a Robotiq 2F-140 gripper grasps each object and runs all six interactions. 400 scenes for training and 100 for test, including 56 unseen objects.</p>
-        <ul class="chips"><li class="vision">RGB + depth</li><li class="audio">Audio</li><li class="touch">Touch &times; 2</li><li class="force">6-axis force</li></ul>
+        <p>An xArm 6 arm with a Robotiq 2F-140 gripper grasps each object and executes all six interactions. We collect 400 scenes for training and 100 scenes for testing, with the test set containing 56 unseen objects.</p>
+        <ul class="chips"><li class="vision">RGB + depth</li><li class="audio">Audio</li><li class="touch">Touch &times; 2</li><li class="force">3-axis force</li></ul>
       </article>
     </div>
 
@@ -195,6 +195,10 @@
           <div class="donut-wrap" id="chart-contents"></div>
         </div>
       </div>
+      <div class="examples">
+        <p class="chart-title">Data examples <span class="ex-hint">Action (Modality) &middot; audio plays on click</span></p>
+        <div class="ex-grid" id="data-examples"></div>
+      </div>
     </div>
 
     <p class="fine reveal">Every object is annotated (Gemini&nbsp;3.5&nbsp;Flash, then manually verified) with identity, material, hardness, roughness, texture, contents, and the sensory modality that can reveal them.</p>
@@ -206,27 +210,27 @@
   <div class="wrap">
     <header class="sec-head">
       <p class="eyebrow"><i></i>System</p>
-      <h2>ROMA System: A Reasoning&ndash;Interaction&ndash;Feedback Loop</h2>
-      <p class="lead">Given an instruction and an initial scene, ROMA decides whether the current evidence is enough. If not, it names the object, the interaction and the modalities to read, then reasons over what comes back, until it can answer.</p>
+      <h2>ROMA System: A Reasoning&ndash;Interaction&ndash;Feedback Loop in the Real World</h2>
+      <p class="lead">ROMA System has two parts: the multi-sensory LLM ROMA-7B, and a physical interface that executes interactions and collects multi-sensory feedback. ROMA-7B determines whether the current evidence is sufficient for the task. When additional evidence is required, it localizes the target object, selects the interaction and sensory modalities to acquire, and directs the physical interface to execute them. The collected feedback is then returned to ROMA-7B for further reasoning, forming an iterative perception-action loop until the task is completed.</p>
     </header>
 
     <div class="loop reveal" aria-label="The ROMA loop">
       <a class="loop-node n-llm" href="#step-reasoning">
         <span class="step">1</span>
         <h3>Reasoning</h3>
-        <p>The Multi-Sensory LLM (ROMA-7B) finds what is missing, then picks the target object, action token and modalities.</p>
+        <p>ROMA-7B finds what is missing, then picks the target object, action token and modalities.</p>
       </a>
       <div class="loop-arrow" aria-hidden="true"></div>
       <a class="loop-node n-act" href="#step-interaction">
         <span class="step">2</span>
         <h3>Interaction</h3>
-        <p>A grasp interface and six atomic interactions turn the decision into robot actions on the object.</p>
+        <p>The physical interface turns the decision into robot actions: a grasp interface and six atomic interactions.</p>
       </a>
       <div class="loop-arrow" aria-hidden="true"></div>
       <a class="loop-node n-fb" href="#step-feedback">
         <span class="step">3</span>
         <h3>Feedback</h3>
-        <p>Vision, audio, touch and force feedback is collected and returned to the LLM for the next round of reasoning.</p>
+        <p>The physical interface collects vision, audio, touch and force feedback and returns it to ROMA-7B for the next round of reasoning.</p>
       </a>
       <svg class="loop-back" viewBox="0 0 1000 46" preserveAspectRatio="none" aria-hidden="true">
         <path d="M930 2 V26 Q930 40 916 40 H84 Q70 40 70 26 V6" />
@@ -237,7 +241,7 @@
 
     <figure class="figure reveal">
       <img src="assest/model.png" alt="ROMA system overview: grasp interface, six real-world interactions, multi-sensor feedback and the Multi-Sensory LLM ROMA-7B" width="3832" height="1832" loading="lazy">
-      <figcaption>Given an initial scene and an instruction, the LLM names the target object, interaction and modality. The interface executes and returns visual, audio, tactile and force feedback.</figcaption>
+      <figcaption>Given an initial scene and an instruction, ROMA-7B identifies the target object and selects the interaction and sensory modalities to acquire. The physical interface then executes the selected actions and returns visual, audio, tactile, and force feedback.</figcaption>
     </figure>
 
     <!-- 1 · Reasoning -->
@@ -247,7 +251,7 @@
         <article class="card reveal">
           <span class="num">Tokens</span>
           <h3>Action &amp; modality tokens</h3>
-          <p>Six action tokens, <code>&lt;grasp_start&gt;</code>/<code>&lt;grasp_end&gt;</code> around a bounding box, and positional tokens for touch and force. Each is initialized from the averaged embeddings of its words plus Gaussian noise.</p>
+          <p>Six action tokens, <code>&lt;grasp_start&gt;</code>/<code>&lt;grasp_end&gt;</code> around the target object, and positional tokens for touch and force. Each is initialized from the averaged embeddings of its words with Gaussian noise.</p>
         </article>
         <article class="card reveal">
           <span class="num">Stage 1</span>
@@ -257,7 +261,7 @@
         <article class="card reveal">
           <span class="num">Stage 2</span>
           <h3>Active perception SFT</h3>
-          <p>The model analyzes the scene, decides whether evidence is sufficient, and otherwise emits the next object, interaction and modalities. It then reasons over the returned feedback and repeats.</p>
+          <p>The model analyzes the scene, decides whether evidence is sufficient, and otherwise emits the next target object, interaction and modalities. It then reasons over the returned feedback and repeats.</p>
         </article>
       </div>
       <div class="curriculum reveal">
@@ -272,23 +276,24 @@
 
     <!-- 2 · Interaction -->
     <div class="stage" id="step-interaction" style="--c: var(--orange)">
-      <header class="stage-head reveal"><span class="step">2</span><div><h3>Interaction</h3><p>The physical interface has two parts: a grasp interface that secures the object, and six atomic interactions that probe it.</p></div></header>
+      <header class="stage-head reveal"><span class="step">2</span><div><h3>Interaction</h3><p>The physical interface consists of two components: a robotic grasping module that securely holds the object, and a set of six predefined interactions that actively probe its physical properties.</p></div></header>
       <div class="interact-grid">
         <article class="card reveal">
           <span class="num">Grasp interface</span>
-          <h3>Stable contact for sensing</h3>
+          <h3>Stable contact for interaction</h3>
           <p>AnyGrasp proposes grasps from the object&rsquo;s point cloud. A symmetry-based completion recovers geometry that transparent and reflective objects lose, then candidates are filtered by height, reachability and orientation, and refined for our gripper.</p>
           <figure class="card-fig"><img src="assest/grasp.png" alt="Object point cloud with completed points and the object, workspace and search cuboids" width="3288" height="1777" loading="lazy"><figcaption>Point-cloud completion and grasp enhancement: completed points (purple) and the object, workspace and search cuboids around an object.</figcaption></figure>
+          <figure class="card-fig"><img src="assest/grasppose.png" alt="Grasp poses predicted by AnyGrasp (left) and by ROMA (right) on the same object" width="3279" height="1358" loading="lazy"><figcaption>AnyGrasp pose vs. ROMA pose. The original AnyGrasp prediction (left) is sometimes an unstable top-down grasp that fails under vigorous interactions such as shaking and rotating. With point-cloud completion (purple) and grasp enhancement, ROMA (right) produces a stable grasp for interactions.</figcaption></figure>
         </article>
         <div class="panel reveal">
           <p class="panel-label">Six atomic interactions</p>
           <ul class="act-grid">
-            <li><code>&lt;lift&gt;</code><span>Raise the object and hold it</span></li>
-            <li><code>&lt;press&gt;</code><span>Press it down against the table</span></li>
-            <li><code>&lt;collide&gt;</code><span>Tap it on the table, repeatedly</span></li>
-            <li><code>&lt;shake&gt;</code><span>Shake it back and forth</span></li>
-            <li><code>&lt;rotate&gt;</code><span>Turn it 180&deg; about the grasp axis</span></li>
-            <li><code>&lt;squeeze&gt;</code><span>Close the gripper a little further</span></li>
+            <li><div class="ex-media"><video data-src="assest/examples/actions/lift_ThirdCamera.mp4" muted loop playsinline preload="none" disablepictureinpicture aria-label="Example of lift"></video></div><code>&lt;lift&gt;</code><span>Hold the object and raise it</span></li>
+            <li><div class="ex-media"><video data-src="assest/examples/actions/press_ThirdCamera.mp4" muted loop playsinline preload="none" disablepictureinpicture aria-label="Example of press"></video></div><code>&lt;press&gt;</code><span>Press it down against the table</span></li>
+            <li><div class="ex-media"><video data-src="assest/examples/actions/collide_ThirdCamera.mp4" muted loop playsinline preload="none" disablepictureinpicture aria-label="Example of collide"></video></div><code>&lt;collide&gt;</code><span>Tap it on the table repeatedly</span></li>
+            <li><div class="ex-media"><video data-src="assest/examples/actions/shake_ThirdCamera.mp4" muted loop playsinline preload="none" disablepictureinpicture aria-label="Example of shake"></video></div><code>&lt;shake&gt;</code><span>Shake it from side to side</span></li>
+            <li><div class="ex-media"><video data-src="assest/examples/actions/rotate_ThirdCamera.mp4" muted loop playsinline preload="none" disablepictureinpicture aria-label="Example of rotate"></video></div><code>&lt;rotate&gt;</code><span>Rotate it 90° about the grasp axis and rotate it back</span></li>
+            <li><div class="ex-media"><video data-src="assest/examples/actions/clench_ThirdCamera.mp4" muted loop playsinline preload="none" disablepictureinpicture aria-label="Example of squeeze"></video></div><code>&lt;squeeze&gt;</code><span>Close the gripper a little further</span></li>
           </ul>
         </div>
       </div>
@@ -299,12 +304,12 @@
       <header class="stage-head reveal"><span class="step">3</span><div><h3>Feedback</h3><p>Every interaction is recorded by four sensory modalities; the model chooses which of them to read.</p></div></header>
       <div class="mod-grid">
         <article class="mod-card m-vision reveal"><img src="assest/vision.png" alt="Wrist-camera image during an interaction" width="640" height="480" loading="lazy"><h4>Vision</h4><p>One wrist-camera image per interaction, showing the object&rsquo;s appearance and how it deforms or moves.</p></article>
-        <article class="mod-card m-audio reveal"><img src="assest/audio.png" alt="Audio spectrogram of an interaction" width="748" height="563" loading="lazy"><h4>Audio</h4><p>One cropped microphone segment of the sound the interaction makes: the rattle of contents inside, or the impact sound of the material.</p></article>
+        <article class="mod-card m-audio reveal"><img src="assest/audio.png" alt="Audio spectrogram of an interaction" width="748" height="563" loading="lazy"><h4>Audio</h4><p>One cropped microphone segment of the sound that the interaction makes.</p></article>
         <article class="mod-card m-touch reveal"><img src="assest/tactile.png" alt="GelSight tactile image" width="320" height="240" loading="lazy"><h4>Touch</h4><p>Two GelSight Mini images, one at the start and one during the interaction, showing local hardness, roughness and texture at the contact.</p></article>
         <article class="mod-card m-force reveal"><img src="assest/force.png" alt="Force versus time during shaking" width="640" height="480" loading="lazy"><h4>Force</h4><p>A wrist force sensor. The mean gravity component during the interaction is given to the LLM as text, a cue for weight.</p></article>
       </div>
       <p class="eq-line reveal">Force is moved to the robot base frame and the empty-gripper force is removed:
-        <span class="eq">F<sub>trans</sub> = R<sub>B&larr;G</sub> R<sub>G&larr;S</sub> (F<sub>raw</sub> &minus; F<sub>raw</sub><sup>0</sup>)</span></p>
+        <span class="eq">F<sub>trans</sub> = R<sub>B&larr;G</sub> R<sub>G&larr;S</sub> (F<sub>raw</sub> &minus; F<sup>0</sup><sub>raw</sub>)</span></p>
     </div>
   </div>
 </section>
@@ -405,13 +410,13 @@
           <li><b>Unseen objects</b><span>56 objects, disjoint from the training and handheld data</span></li>
           <li><b>Intent-driven questions</b><span>written by GPT-5.4 from the scene annotations</span></li>
           <li><b>Success criterion</b><span>the predicted grasp box must overlap a ground-truth object by at least 70%</span></li>
-          <li><b>Real-robot subset</b><span>8 re-created scenes, 132 free-form tasks</span></li>
+          <li><b>Real-robot execution</b><span>132 free-form tasks, answer options removed</span></li>
         </ul>
       </div>
       <div class="panel reveal">
         <p class="chart-title">Which attributes appear together</p>
         <div id="chart-chord" class="chord"></div>
-        <p class="fine center">Arc length: tasks involving the attribute (Single + Multi-Chain). Ribbons: attribute pairs co-occurring in Multi-Chain tasks; ribbon widths are illustrative.</p>
+        <p class="fine center">Arc length: tasks involving the attribute. Ribbons: the two attributes linked by a Multi-chain task (1,036 tasks). The lighter part of each arc is Single-chain tasks (741), which involve one attribute.</p>
       </div>
     </div>
 
@@ -487,7 +492,7 @@
       </div>
     </div>
 
-    <h3 class="sub-h reveal">A case study</h3>
+    <h3 class="sub-h reveal">Case study</h3>
     <div class="case-intro reveal">
       <figure class="case-scene">
         <img src="assest/case.png" alt="Initial scene: a plush pig, a metal tin, and three objects on the right: a white box, a grey cube and a black box" width="1280" height="720" loading="lazy">
@@ -536,9 +541,6 @@
   journal = {arXiv preprint},
   year    = {2026}
 }</pre>
-    </div>
-    <p class="fine center">Supported in part by the Beijing Major Science and Technology Project (Z251100008125018) and the Beijing Academy of Artificial Intelligence (BAAI). We thank Siyu Mei and Mingxin Wang for help with data collection and annotation.</p>
-  </div>
 </section>
 
 </main>

@@ -190,27 +190,131 @@
    * ------------------------------------------------------------------ */
   const SUBSETS = [
     {
-      tab: 'Handheld', color: 'var(--blue)', big: '1,657', small: 'objects',
+      ex: 'hand', tab: 'Handheld', color: 'var(--blue)', big: '1,657', small: 'objects',
       materials: [['plastic', 908], ['paper', 488], ['metal', 255], ['fabric', 105], ['wood', 38], ['rubber', 32], ['glass', 29],
         ['silicone', 27], ['ceramic', 17], ['sponge', 16], ['leather', 16], ['foam', 14], ['cotton', 3], ['plants', 3]],
       has: 688, none: 969,
     },
     {
-      tab: 'Tabletop · train', color: 'var(--purple)', big: '1,269', small: 'instances',
+      ex: 'table', tab: 'Tabletop · train', color: 'var(--purple)', big: '1,269', small: 'instances',
       materials: [['plastic', 664], ['paper', 313], ['metal', 154], ['glass', 50], ['fabric', 40], ['ceramic', 36], ['wood', 25],
         ['sponge', 19], ['leather', 11], ['rubber', 9], ['silicone', 8], ['nylon', 3], ['wax', 2]],
       has: 693, none: 576,
     },
     {
-      tab: 'ROMA Bench', color: 'var(--orange)', big: '325', small: 'instances',
+      ex: 'bench', tab: 'ROMA Bench', color: 'var(--orange)', big: '325', small: 'instances',
       materials: [['plastic', 141], ['paper', 69], ['ceramic', 24], ['metal', 23], ['sponge', 22], ['silicone', 16], ['fabric', 11],
         ['leather', 10], ['glass', 6], ['rubber', 4]],
       has: 173, none: 152,
     },
   ];
+  /* ------------------------------------------------------------------ *
+   * Looping example clips: no player chrome, play only while on screen
+   * ------------------------------------------------------------------ */
+  const clipObs = new IntersectionObserver((entries) => {
+    entries.forEach((e) => {
+      const v = e.target;
+      if (e.isIntersecting) {
+        if (!v.getAttribute('src')) v.src = v.dataset.src;
+        if (!reduceMotion) v.play().catch(() => {});
+      } else if (v.getAttribute('src')) v.pause();
+    });
+  }, { rootMargin: '200px 0px' });
+
+  function clip(v, rate = 1) {
+    v.muted = true; v.loop = true; v.playsInline = true;
+    v.removeAttribute('controls');
+    v.disablePictureInPicture = true;
+    const setRate = () => { v.playbackRate = rate; };
+    v.addEventListener('loadedmetadata', setRate);
+    v.addEventListener('play', setRate);
+    v.addEventListener('contextmenu', (e) => e.preventDefault());
+    clipObs.observe(v);
+    return v;
+  }
+  $$('video[data-src]').forEach((v) => clip(v));
+
+  /* ---------------- dataset examples (assest/examples) ---------------- */
+  const EXDIR = 'assest/examples/';
+  const MODS = { vision: 'Vision', audio: 'Audio', touch: 'Touch', force: 'Force' };
+  function tableLike(dir) {
+    return [
+      { type: 'image', file: `${dir}/Initial_180.png`, mod: 'vision', label: 'Initial scene' },
+      { type: 'video', file: `${dir}/collide_ThirdCamera.mp4`, action: 'collide', mod: 'vision', note: 'third view' },
+      { type: 'video', file: `${dir}/collide_WristCamera.mp4`, action: 'collide', mod: 'vision', note: 'wrist view' },
+      { type: 'video', file: `${dir}/clench_GelSightL.mp4`, action: 'squeeze', mod: 'touch', note: 'left sensor' },
+      { type: 'video', file: `${dir}/clench_GelSightR.mp4`, action: 'squeeze', mod: 'touch', note: 'right sensor' },
+      { type: 'audio', file: `${dir}/audio_enhanced_cut.wav`, action: 'shake', mod: 'audio' },
+      { type: 'video', file: `${dir}/rotate_force.mp4`, action: 'rotate', mod: 'force', rate: 2, badge: '2× speed', fit: 'contain' },
+    ];
+  }
+  const EXAMPLES = {
+    hand: [
+      { type: 'video', file: 'hand/collide_ThirdCamera.mp4', action: 'collide', mod: 'vision', note: 'third view' },
+      { type: 'video', file: 'hand/collide_WristCamera.mp4', action: 'collide', mod: 'vision', note: 'wrist view' },
+      { type: 'video', file: 'hand/clench_GelSight1.mp4', action: 'squeeze', mod: 'touch', note: 'sensor 1' },
+      { type: 'video', file: 'hand/clench_GelSight2.mp4', action: 'squeeze', mod: 'touch', note: 'sensor 2' },
+      { type: 'audio', file: 'hand/shake_mic.wav', action: 'shake', mod: 'audio' },
+    ],
+    table: tableLike('table'),
+    bench: tableLike('bench'),
+  };
+
+  let playingAudio = null;
+  function audioTile(it) {
+    const bars = Array.from({ length: 28 }, (_, i) => {
+      const hgt = 18 + 62 * Math.abs(Math.sin(i * 1.7) * Math.cos(i * 0.55 + 1));
+      return s('rect', { x: 8 + i * 6.2, y: 50 - hgt / 2, width: 3.4, height: hgt, rx: 1.7 });
+    });
+    const audio = h('audio', { src: EXDIR + it.file, preload: 'none' });
+    const icons = '<svg viewBox="0 0 24 24" class="i-play"><path d="M8 5.5v13a1 1 0 0 0 1.5.86l10.5-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5z"/></svg>'
+      + '<svg viewBox="0 0 24 24" class="i-pause"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg>';
+    const btn = h('button', { type: 'button', class: 'audio-tile', 'aria-label': 'Play audio example' },
+      s('svg', { viewBox: '0 0 190 100', preserveAspectRatio: 'none', 'aria-hidden': 'true', class: 'wave' }, ...bars),
+      h('span', { class: 'ap', html: icons }),
+      audio);
+    const sync = () => btn.classList.toggle('is-playing', !audio.paused);
+    ['play', 'pause', 'ended'].forEach((ev) => audio.addEventListener(ev, sync));
+    btn.addEventListener('click', () => {
+      if (!audio.paused) { audio.pause(); return; }
+      if (playingAudio && playingAudio !== audio) playingAudio.pause();
+      playingAudio = audio; audio.currentTime = 0; audio.play().catch(() => {});
+    });
+    return btn;
+  }
+  function renderExamples(key) {
+    const grid = $('#data-examples');
+    if (!grid) return;
+    if (playingAudio) { playingAudio.pause(); playingAudio = null; }
+    grid.querySelectorAll('video').forEach((v) => clipObs.unobserve(v));
+    const figs = EXAMPLES[key].map((it) => {
+      let media;
+      if (it.type === 'video') {
+        const v = h('video', { 'data-src': EXDIR + it.file, preload: 'none', 'aria-label': `${it.action} ${MODS[it.mod]} example` });
+        if (it.fit) v.style.objectFit = it.fit;
+        media = clip(v, it.rate || 1);
+      } else if (it.type === 'image') {
+        media = h('img', { src: EXDIR + it.file, alt: 'Initial scene', loading: 'lazy' });
+      } else media = audioTile(it);
+      const note = it.note ? `, ${it.note}` : '';
+      const cap = h('figcaption', { html: it.action
+        ? `<code>&lt;${it.action}&gt;</code> <span class="m ${it.mod}">(${MODS[it.mod]}${note})</span>${it.badge ? `<em class="rate">${it.badge}</em>` : ''}`
+        : `${it.label} <span class="m ${it.mod}">(${MODS[it.mod]})</span>` });
+      return h('figure', { class: 'ex' }, h('div', { class: 'ex-media' }, media), cap);
+    });
+    grid.className = key === 'hand' ? 'ex-grid rows' : 'ex-grid split';
+    if (key === 'hand') {
+      grid.replaceChildren(h('div', { class: 'ex-row' }, ...figs.slice(0, 2)), h('div', { class: 'ex-row' }, ...figs.slice(2)));
+    } else {
+      figs[0].classList.add('ex-lead');
+      grid.replaceChildren(...figs);
+    }
+  }
+
   const dataTabs = $('#data-tabs');
   if (dataTabs) {
     tabs(dataTabs, SUBSETS, (d) => {
+      renderExamples(d.ex);
       mount($('#chart-materials'), (el) => {
         el.classList.add('hbars');
         hbars(el, d.materials.map(([label, value]) => ({ label, value })), { color: d.color });
@@ -264,26 +368,22 @@
   }
 
   function drawChord(el) {
-    // Arc totals are the numbers printed on Fig. 18. Every Multi-Chain task links exactly two
-    // attributes, but the paper gives no pair counts, so ribbon widths are a smooth estimate:
-    // a rough seed matrix rescaled (symmetric IPF) until each row sums to the arc total.
+    // Counts from the ROMA Bench annotations. Multi-chain (level-2) tasks link two attributes and
+    // draw the ribbons; single-chain (level-1) tasks involve one attribute and only lengthen its arc.
     const names = ['Hardness', 'Roughness', 'Texture', 'Material', 'Weight', 'Inside'];
-    const totals = [378, 247, 409, 673, 582, 524];
     const colors = ['#2b7fe0', '#3fa46a', '#12a3b8', '#7a63cc', '#e0527a', '#f5921e'];
     const n = names.length;
-    const seed = [
-      [0, 40, 70, 110, 80, 80],
-      [40, 0, 40, 50, 25, 30],
-      [70, 40, 0, 100, 55, 75],
-      [110, 50, 100, 0, 190, 120],
-      [80, 25, 55, 190, 0, 170],
-      [80, 30, 75, 120, 170, 0],
+    const solo = [99, 78, 42, 291, 153, 78];
+    const m = [
+      [0, 25, 61, 85, 49, 59],
+      [25, 0, 75, 17, 22, 30],
+      [61, 75, 0, 35, 102, 94],
+      [85, 17, 35, 0, 119, 126],
+      [49, 22, 102, 119, 0, 137],
+      [59, 30, 94, 126, 137, 0],
     ];
-    const m = seed.map((r) => r.slice());
-    for (let it = 0; it < 500; it++) {
-      const f = totals.map((t, i) => Math.sqrt(t / m[i].reduce((a, b) => a + b, 0)));
-      for (let i = 0; i < n; i++) for (let j = 0; j < n; j++) m[i][j] *= f[i] * f[j];
-    }
+    const paired = m.map((row) => row.reduce((a, b) => a + b, 0));
+    const totals = solo.map((v, i) => v + paired[i]); // 378, 247, 409, 673, 582, 524
 
     const cx = 290, cy = 236, R = 168, r = 156, gap = 0.07;
     const k = (2 * Math.PI - n * gap) / totals.reduce((a, b) => a + b, 0);
@@ -312,13 +412,19 @@
       defs.append(s('linearGradient', { id, gradientUnits: 'userSpaceOnUse', x1: A[0], y1: A[1], x2: B[0], y2: B[1] },
         s('stop', { offset: 0, 'stop-color': colors[i] }), s('stop', { offset: 1, 'stop-color': colors[j] })));
       const d = `M${pt(P(r, p0))} A${r},${r} 0 0 1 ${pt(P(r, p1))} Q${cx},${cy} ${pt(P(r, q0))} A${r},${r} 0 0 1 ${pt(P(r, q1))} Q${cx},${cy} ${pt(P(r, p0))}Z`;
-      ribbons.push(s('path', { class: 'ribbon', d, fill: `url(#${id})`, 'data-i': i, 'data-j': j }, s('title', { text: `${names[i]} + ${names[j]}` })));
+      ribbons.push(s('path', { class: 'ribbon', d, fill: `url(#${id})`, 'data-i': i, 'data-j': j }, s('title', { text: `${names[i]} + ${names[j]}: ${m[i][j]} multi-chain tasks` })));
     }
 
+    const ringPath = (b0, b1) => {
+      const big = b1 - b0 > Math.PI ? 1 : 0;
+      return `M${pt(P(R, b0))} A${R},${R} 0 ${big} 1 ${pt(P(R, b1))} L${pt(P(r + 3, b1))} A${r + 3},${r + 3} 0 ${big} 0 ${pt(P(r + 3, b0))}Z`;
+    };
     const arcEls = arcs.map(({ i, a0, a1 }) => {
-      const big = a1 - a0 > Math.PI ? 1 : 0;
-      const d = `M${pt(P(R, a0))} A${R},${R} 0 ${big} 1 ${pt(P(R, a1))} L${pt(P(r + 3, a1))} A${r + 3},${r + 3} 0 ${big} 0 ${pt(P(r + 3, a0))}Z`;
-      return s('path', { class: 'arc', d, fill: colors[i], 'data-i': i }, s('title', { text: `${names[i]}: ${totals[i]} tasks` }));
+      const split = a0 + paired[i] * k; // ribbons use [a0, split]; the rest is single-chain only
+      const tip = `${names[i]}: ${totals[i]} tasks (${solo[i]} single-chain, ${paired[i]} multi-chain pairings)`;
+      return s('g', { class: 'arc', 'data-i': i },
+        s('path', { d: ringPath(a0, split), fill: colors[i] }, s('title', { text: tip })),
+        s('path', { d: ringPath(split, a1), fill: colors[i], opacity: 0.45 }, s('title', { text: tip })));
     });
 
     const labels = arcs.map(({ i, mid }) => {
