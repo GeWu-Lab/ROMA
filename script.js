@@ -480,8 +480,8 @@
       q3: [33.3, 15.7, 18.5, 23.5], roma: [57.4, 64.7, 63.0, 61.4],
     },
     {
-      tab: 'Oracle boxes',
-      note: 'Oracle boxes are offered and matching is relaxed, so localization errors mostly vanish. Not a realistic setting: frontier models catch up on several single-chain attributes, yet ROMA-7B stays ahead overall.',
+      tab: 'Oracle boxes*',
+      note: 'Oracle boxes are offered and matching is relaxed, so localization errors mostly vanish for GPT and Gemini. <b>Not a realistic setting</b>. Frontier models catch up on several single-chain attributes, yet ROMA-7B stays ahead overall.',
       gpt: [68.2, 58.5, 67.5, 63.3], gem: [74.5, 65.1, 67.5, 68.8], q25: [31.3, 32.1, 31.3, 31.7],
       q3: [23.6, 14.8, 31.9, 20.5], roma: [75.0, 76.4, 77.1, 76.0],
     },
@@ -491,7 +491,7 @@
     $('#model-legend').append(...MODELS.map((m) =>
       h('li', { class: m.key === 'roma' ? 'roma' : '', style: `--c:${m.color}` }, h('i', { class: m.key === 'roma' ? 'roma' : '' }), m.name)));
     tabs(resTabs, SETTINGS, (st) => {
-      $('#res-note').textContent = st.note;
+      $('#res-note').innerHTML = st.note;
       mount($('#chart-models'), (el) => {
         GROUPS.forEach((g, gi) => {
           el.append(h('div', { class: 'col-group' },
@@ -632,6 +632,40 @@
     ];
     mount(abl, (el) => hbars(el, ROWS, { max: 2.4, fmtv: (v) => '−' + v.toFixed(1) }));
   }
+
+  /* ---------------- real-robot demos: control bar below the video ---------------- */
+  $$('.rw-player').forEach((box) => {
+    const v = $('video', box), seek = $('.rw-seek', box), time = $('.rw-time', box);
+    const t = (x) => `${Math.floor(x / 60)}:${String(Math.floor(x % 60)).padStart(2, '0')}`;
+    const draw = () => {
+      const d = v.duration || 0;
+      seek.value = d ? (v.currentTime / d) * 1000 : 0;
+      seek.style.setProperty('--p', `${seek.value / 10}%`);
+      time.textContent = `${t(v.currentTime)} / ${t(d)}`;
+    };
+    const state = () => {
+      box.classList.toggle('is-playing', !v.paused && !v.ended);
+      box.classList.toggle('is-muted', v.muted || v.volume === 0);
+      $('.rw-play', box).setAttribute('aria-label', v.paused ? 'Play' : 'Pause');
+    };
+    const toggle = () => { if (v.paused || v.ended) v.play().catch(() => {}); else v.pause(); };
+    $('.rw-play', box).addEventListener('click', toggle);
+    v.addEventListener('click', toggle);
+    $('.rw-mute', box).addEventListener('click', () => { v.muted = !v.muted; });
+    $('.rw-fs', box).addEventListener('click', () => {
+      if (document.fullscreenElement) document.exitFullscreen();
+      else (box.requestFullscreen || box.webkitRequestFullscreen).call(box);
+    });
+    seek.addEventListener('input', () => {
+      if (v.duration) v.currentTime = (seek.value / 1000) * v.duration;
+      draw();
+    });
+    ['timeupdate', 'loadedmetadata', 'durationchange'].forEach((ev) => v.addEventListener(ev, draw));
+    ['play', 'pause', 'ended', 'volumechange'].forEach((ev) => v.addEventListener(ev, state));
+    // only one demo plays at a time
+    v.addEventListener('play', () => $$('.rw-player video').forEach((o) => { if (o !== v) o.pause(); }));
+    draw(); state();
+  });
 
   /* ------------------------------------------------------------------ *
    * BibTeX copy

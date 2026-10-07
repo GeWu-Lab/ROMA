@@ -49,7 +49,7 @@
 
     <ul class="authors">
       <li><a href="https://xxuan01.github.io/" target="_blank" rel="noopener">Ruoxuan Feng</a><sup>1,2,3,*</sup></li>
-      <li>Yutong Chen<sup>4,*</sup></li>
+      <li><a href="https://github.com/gitagitty" target="_blank" rel="noopener">Yutong Chen</a><sup>4,*</sup></li>
       <li><a href="https://scholar.google.com.hk/citations?user=v5LctN8AAAAJ" target="_blank" rel="noopener">Ruihua Song</a><sup>1,2</sup></li>
       <li><a href="https://hyang0511.github.io/" target="_blank" rel="noopener">Huan Yang</a><sup>3</sup></li>
       <li><a href="https://www.wangzhongyuan.com/" target="_blank" rel="noopener">Zhongyuan Wang</a><sup>3</sup></li>
@@ -67,8 +67,8 @@
     <p class="notes"><sup>*</sup>Equal contribution &nbsp;&middot;&nbsp; <sup>&#x2709;</sup>Corresponding author</p>
 
     <nav class="links" aria-label="Project resources">
-      <a class="btn" aria-disabled="true" title="Coming soon">
-        <svg viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></svg>Paper<em>soon</em>
+      <a class="btn" href="https://arxiv.org/abs/2610.06955" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></svg>Paper
       </a>
       <a class="btn" href="https://github.com/GeWu-Lab/ROMA" target="_blank" rel="noopener">
         <svg viewBox="0 0 24 24"><path d="m8 7-5 5 5 5M16 7l5 5-5 5M14 4l-4 16"/></svg>Code &amp; GUI Demo
@@ -320,7 +320,7 @@
     <header class="sec-head">
       <p class="eyebrow"><i></i>Benchmark</p>
       <h2>ROMA Bench: Active Perception as Perception Chains</h2>
-      <p class="lead">Active perception unfolds as a chain: each interaction gives new evidence that shapes the next one. ROMA Bench holds 2,100 scene-level tasks from the tabletop test split, in three flavors.</p>
+      <p class="lead">Active perception is formulated as a chain, where each interaction provides new evidence that informs subsequent decisions. ROMA Bench contains 2,100 scene-level tasks from the tabletop test split, organized into three types: single-chain, multi-chain, and intent-driven perception.</p>
     </header>
 
     <svg class="svg-defs" width="0" height="0" aria-hidden="true" focusable="false">
@@ -370,7 +370,7 @@
       </article>
       <article class="chain c-intent reveal">
         <span class="tag c-green">Intent-driven</span>
-        <p class="q">&ldquo;Find me a treat to eat.&rdquo;</p>
+        <p class="q">&ldquo;Find me lots of treats to eat.&rdquo;</p>
         <svg class="chain-svg" viewBox="0 0 410 130" role="img" aria-label="An instruction is analyzed into two chains, Heavy? with lift and Empty? with shake plus force reused from lift, both leading to one answer">
           <rect class="k intent" x="4" y="51" width="76" height="28" rx="8"/><text class="t" x="42" y="69" text-anchor="middle">Instruction</text>
           <path class="ln" d="M80 65 C90 65 90 34 96 34" marker-end="url(#ah)"/>
@@ -382,7 +382,7 @@
           <circle class="bd f" cx="209" cy="34" r="8"/><text class="bt" x="209" y="37.2" text-anchor="middle">F</text>
           <path class="ln" d="M226 34 H336 C342 34 344 54 348 59" marker-end="url(#ah)"/>
 
-          <rect class="k" x="98" y="82" width="56" height="28" rx="8"/><text class="t" x="126" y="100" text-anchor="middle">Empty?</text>
+          <rect class="k" x="98" y="82" width="56" height="28" rx="8"/><text class="t" x="126" y="100" text-anchor="middle">Inside?</text>
           <path class="ln" d="M154 96 H168" marker-end="url(#ah)"/>
           <rect class="k act" x="170" y="82" width="73" height="28" rx="8"/><text class="t" x="179" y="100">shake</text>
           <circle class="bd a" cx="226" cy="96" r="8"/><text class="bt" x="226" y="99.2" text-anchor="middle">A</text>
@@ -395,7 +395,7 @@
           <rect class="k ans" x="350" y="51" width="58" height="28" rx="8"/><text class="t w" x="379" y="69" text-anchor="middle">Answer</text>
           <path class="ln reuse-ln" d="M198 48 C198 72 293 58 293 80" marker-end="url(#ahp)"/>
         </svg>
-        <p>The model infers which attributes matter from an implicit goal, then chains them.</p>
+        <p>The model infers which attributes matter from an implicit instruction, then chains them.</p>
       </article>
     </div>
 
@@ -406,10 +406,10 @@
         <p class="chart-title spaced">Question formats</p>
         <ul class="chips neutral"><li>Multiple choice</li><li>True or false</li><li>Ranking</li></ul>
         <ul class="facts">
-          <li><b>Test split</b><span>100 held-out tabletop scenes, 2,100 tasks</span></li>
-          <li><b>Unseen objects</b><span>56 objects, disjoint from the training and handheld data</span></li>
+          <!-- <li><b>Test split</b><span>100 held-out tabletop scenes, 2,100 tasks</span></li> -->
+          <li><b>Unseen objects</b><span>100 tabletop scenes, 2,100 tasks with 56 unseen objects, disjoint from the training data</span></li>
           <li><b>Intent-driven questions</b><span>written by GPT-5.4 from the scene annotations</span></li>
-          <li><b>Success criterion</b><span>the predicted grasp box must overlap a ground-truth object by at least 70%</span></li>
+          <li><b>Grasp success criterion</b><span>the predicted bbox must overlap a ground-truth by at least 70%</span></li>
           <li><b>Real-robot execution</b><span>132 free-form tasks, answer options removed</span></li>
         </ul>
       </div>
@@ -428,8 +428,8 @@
   <div class="wrap">
     <header class="sec-head">
       <p class="eyebrow"><i></i>Results</p>
-      <h2>ROMA-7B beats frontier MLLMs on active perception</h2>
-      <p class="lead">Long-chain and multi-attribute tasks are where ROMA opens the widest gap. Numbers are task success rates (%).</p>
+      <h2>ROMA-7B beats frontier MLLMs on multi-sensory active perception</h2>
+      <p class="lead">ROMA-7B demonstrates the strongest advantages on long-chain and multi-attribute tasks. Numbers are task success rates (%).</p>
     </header>
 
     <div class="panel reveal">
@@ -452,6 +452,52 @@
       <div class="win reveal"><b>+24.2</b><span>Multi-chain<br>over the best baseline</span></div>
       <div class="win reveal"><b>+13.7</b><span>Intent-driven<br>over the best baseline</span></div>
       <div class="win reveal"><b>+19.7</b><span>Real robot<br>over the best baseline</span></div>
+    </div>
+
+    <div class="realworld">
+      <h3 class="sub-h reveal">Real-robot demos</h3>
+      <p class="lead small reveal">One real-world run for each task type, autonomously‌ executed by ROMA System on the robot arm. The videos include audio, so unmute them to hear the interaction sounds. Some waiting and moving segments are sped up.</p>
+      <div class="rw-grid">
+        <figure class="rw reveal">
+          <figcaption class="rw-head"><span class="tag c-blue">Single-chain</span><p class="rw-q"><b>Task</b><span class="rw-qt">Which object is the heaviest?</span></p></figcaption>
+          <div class="rw-player">
+            <video playsinline preload="metadata" src="assest/single/single-1.mp4#t=0.1" aria-label="Real-robot demo, single-chain task"></video>
+            <div class="rw-bar">
+              <button type="button" class="rw-play" aria-label="Play"><svg viewBox="0 0 24 24" class="i-play"><path d="M8 5.5v13a1 1 0 0 0 1.5.86l10.5-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5z"/></svg><svg viewBox="0 0 24 24" class="i-pause"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg></button>
+              <input class="rw-seek" type="range" min="0" max="1000" value="0" aria-label="Seek">
+              <span class="rw-time">0:00 / 0:00</span>
+              <button type="button" class="rw-mute" aria-label="Mute"><svg viewBox="0 0 24 24" class="i-vol"><path d="M4 9.5v5h3.5l4.5 4v-13l-4.5 4zM15.5 8.5a5 5 0 0 1 0 7M18 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg><svg viewBox="0 0 24 24" class="i-muted"><path d="M4 9.5v5h3.5l4.5 4v-13l-4.5 4zM16 9.5l5 5M21 9.5l-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+              <button type="button" class="rw-fs" aria-label="Fullscreen"><svg viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+            </div>
+          </div>
+        </figure>
+        <figure class="rw reveal">
+          <figcaption class="rw-head"><span class="tag c-orange">Multi-chain</span><p class="rw-q"><b>Task</b><span class="rw-qt">Is the heaviest object empty?</span></p></figcaption>
+          <div class="rw-player">
+            <video playsinline preload="metadata" src="assest/multi/multi-1.mp4#t=0.1" aria-label="Real-robot demo, multi-chain task"></video>
+            <div class="rw-bar">
+              <button type="button" class="rw-play" aria-label="Play"><svg viewBox="0 0 24 24" class="i-play"><path d="M8 5.5v13a1 1 0 0 0 1.5.86l10.5-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5z"/></svg><svg viewBox="0 0 24 24" class="i-pause"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg></button>
+              <input class="rw-seek" type="range" min="0" max="1000" value="0" aria-label="Seek">
+              <span class="rw-time">0:00 / 0:00</span>
+              <button type="button" class="rw-mute" aria-label="Mute"><svg viewBox="0 0 24 24" class="i-vol"><path d="M4 9.5v5h3.5l4.5 4v-13l-4.5 4zM15.5 8.5a5 5 0 0 1 0 7M18 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg><svg viewBox="0 0 24 24" class="i-muted"><path d="M4 9.5v5h3.5l4.5 4v-13l-4.5 4zM16 9.5l5 5M21 9.5l-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+              <button type="button" class="rw-fs" aria-label="Fullscreen"><svg viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+            </div>
+          </div>
+        </figure>
+        <figure class="rw reveal">
+          <figcaption class="rw-head"><span class="tag c-green">Intent-driven</span><p class="rw-q"><b>Task</b><span class="rw-qt">I am hungry.</span></p></figcaption>
+          <div class="rw-player">
+            <video playsinline preload="metadata" src="assest/intent/intent-1.mp4#t=0.1" aria-label="Real-robot demo, intent-driven task"></video>
+            <div class="rw-bar">
+              <button type="button" class="rw-play" aria-label="Play"><svg viewBox="0 0 24 24" class="i-play"><path d="M8 5.5v13a1 1 0 0 0 1.5.86l10.5-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5z"/></svg><svg viewBox="0 0 24 24" class="i-pause"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg></button>
+              <input class="rw-seek" type="range" min="0" max="1000" value="0" aria-label="Seek">
+              <span class="rw-time">0:00 / 0:00</span>
+              <button type="button" class="rw-mute" aria-label="Mute"><svg viewBox="0 0 24 24" class="i-vol"><path d="M4 9.5v5h3.5l4.5 4v-13l-4.5 4zM15.5 8.5a5 5 0 0 1 0 7M18 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg><svg viewBox="0 0 24 24" class="i-muted"><path d="M4 9.5v5h3.5l4.5 4v-13l-4.5 4zM16 9.5l5 5M21 9.5l-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+              <button type="button" class="rw-fs" aria-label="Fullscreen"><svg viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+            </div>
+          </div>
+        </figure>
+      </div>
     </div>
   </div>
 </section>
@@ -485,9 +531,9 @@
           <p class="fine">Frontier models lean on <code>&lt;lift&gt;</code> and <code>&lt;squeeze&gt;</code>. ROMA uses <code>&lt;rotate&gt;</code>, <code>&lt;press&gt;</code> and <code>&lt;collide&gt;</code> as complementary probes.</p>
         </div>
         <div class="panel reveal">
-          <p class="chart-title">Take a sense away, lose the matching skill</p>
+          <p class="chart-title">Remove a modality, the matching capability degrades</p>
           <div class="dumbbells" id="chart-modality"></div>
-          <p class="fine">Single-chain success when the modality returns &ldquo;Not Available&rdquo;. Overall: 72.9 &rarr; 64.1 without audio, 62.7 without touch, 62.2 without force.</p>
+          <p class="fine">Single-chain success rates when the modality returns &ldquo;Not Available&rdquo;. Overall: 72.9 &rarr; 64.1 without audio, 62.7 without touch, 62.2 without force.</p>
         </div>
       </div>
     </div>
@@ -538,7 +584,8 @@
   title   = {ROMA: LLM System for Real-World Object-Centric Multi-Sensory Active Perception},
   author  = {Feng, Ruoxuan and Chen, Yutong and Song, Ruihua and Yang, Huan and
              Wang, Zhongyuan and Yao, Guocai and Hu, Di},
-  journal = {arXiv preprint},
+  journal = {arXiv preprint arXiv:2610.06955},
+  url     = {https://arxiv.org/abs/2610.06955},
   year    = {2026}
 }</pre>
 </section>
