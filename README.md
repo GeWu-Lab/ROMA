@@ -100,7 +100,7 @@ ROMA-Qwen2.5-Omni-7B/
 ### 2. Run the web demo
 
 ```bash
-python demo.py --model_path /path/to/ROMA-Qwen2.5-Omni-7B --gpu 0 --port 7860
+python demo.py --model_path resources/models/ROMA-Qwen2.5-Omni-7B --gpu 0 --port 7860
 ```
 
 Then open `http://localhost:7860`, type a question (or pick an example), and press **Ask ROMA**. `--model_path` is the only required path: the base model and all adapters are loaded from that directory, in the same order as during training (base Qwen2.5-Omni, tactile encoder, new tokens, audio adapter, tactile adapter, ROMA LLM). Other options: `--host`, `--port`, `--share` (create a public Gradio link).
