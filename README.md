@@ -97,13 +97,17 @@ ROMA-Qwen2.5-Omni-7B/
 └── ROMA-LLM.bin         # ROMA LLM weights
 ```
 
-### 2. Run the web demo
+### 2. Check the checkpoint path
+
+The demo reads the checkpoint directory from `MODEL_PATH_2_5` in [`config/global_name.py`](config/global_name.py), which defaults to `resources/models/ROMA-Qwen2.5-Omni-7B`. If you downloaded the checkpoint elsewhere, edit this path accordingly.
+
+### 3. Run the web demo
 
 ```bash
-python demo.py --model_path resources/models/ROMA-Qwen2.5-Omni-7B --gpu 0 --port 7860
+python demo.py --gpu 0 --port 7860
 ```
 
-Then open `http://localhost:7860`, type a question (or pick an example), and press **Ask ROMA**. `--model_path` is the only required path: the base model and all adapters are loaded from that directory, in the same order as during training (base Qwen2.5-Omni, tactile encoder, new tokens, audio adapter, tactile adapter, ROMA LLM). Other options: `--host`, `--port`, `--share` (create a public Gradio link).
+Then open `http://localhost:7860`, type a question (or pick an example), and press **Ask ROMA**. The base model and all adapters are loaded from the checkpoint directory in the same order as during training (base Qwen2.5-Omni, tactile encoder, new tokens, audio adapter, tactile adapter, ROMA LLM). Options: `--gpu`, `--host`, `--port`, `--share` (create a public Gradio link).
 
 ## Repository Structure
 
