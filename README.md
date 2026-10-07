@@ -12,7 +12,7 @@
   <a href="https://github.com/GeWu-Lab/ROMA"><img src="https://img.shields.io/badge/Code-GitHub-black" alt="Code"></a>
 </p>
 <p align="center">
-  <a href="https://xxuan01.github.io/">Ruoxuan Feng</a><sup>*</sup>, <a href="">Yutong Chen</a><sup>*</sup>, <a href="https://scholar.google.com.hk/citations?user=v5LctN8AAAAJ">Ruihua Song</a>, <a href="https://hyang0511.github.io/">Huan Yang</a>, <a href="https://www.wangzhongyuan.com/">Zhongyuan Wang</a>, <a href="https://scholar.google.com/citations?user=FLkv_vIAAAAJ">Guocai Yao</a>, <a href="https://dtaoo.github.io/">Di Hu</a><sup>&#9993;</sup>
+  <a href="https://xxuan01.github.io/">Ruoxuan Feng</a><sup>*</sup>, <a href="https://github.com/gitagitty">Yutong Chen</a><sup>*</sup>, <a href="https://scholar.google.com.hk/citations?user=v5LctN8AAAAJ">Ruihua Song</a>, <a href="https://hyang0511.github.io/">Huan Yang</a>, <a href="https://www.wangzhongyuan.com/">Zhongyuan Wang</a>, <a href="https://scholar.google.com/citations?user=FLkv_vIAAAAJ">Guocai Yao</a>, <a href="https://dtaoo.github.io/">Di Hu</a><sup>&#9993;</sup>
   <br>
   <sup>*</sup>Equal contribution &nbsp; <sup>&#9993;</sup>Corresponding author
 </p>
