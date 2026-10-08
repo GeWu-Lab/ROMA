@@ -7,7 +7,7 @@
   <meta name="description" content="ROMA is an LLM-based system that actively acquires missing evidence through physical interaction, integrating vision, audio, touch and force in a reasoning-interaction-feedback loop.">
   <meta name="theme-color" content="#fbfaf6">
   <meta property="og:title" content="ROMA: Multi-Sensory Active Perception">
-  <meta property="og:description" content="I saw. I touched. I understood. An LLM system that decides what to sense, how to sense it, and when it knows enough.">
+  <meta property="og:description" content="I saw, I touched, I understood. An LLM system that decides what to sense, how to sense it, and when it knows enough.">
   <link rel="icon" type="image/png" href="assest/logo.png">
   <link rel="stylesheet" href="styles.css">
   <script defer src="script.js"></script>
@@ -49,7 +49,7 @@
 
     <ul class="authors">
       <li><a href="https://xxuan01.github.io/" target="_blank" rel="noopener">Ruoxuan Feng</a><sup>1,2,3,*</sup></li>
-      <li><a href="https://github.com/gitagitty" target="_blank" rel="noopener">Yutong Chen</a><sup>4,*</sup></li>
+      <li><a href="https://gitagitty.github.io/" target="_blank" rel="noopener">Yutong Chen</a><sup>4,*</sup></li>
       <li><a href="https://scholar.google.com.hk/citations?user=v5LctN8AAAAJ" target="_blank" rel="noopener">Ruihua Song</a><sup>1,2</sup></li>
       <li><a href="https://hyang0511.github.io/" target="_blank" rel="noopener">Huan Yang</a><sup>3</sup></li>
       <li><a href="https://www.wangzhongyuan.com/" target="_blank" rel="noopener">Zhongyuan Wang</a><sup>3</sup></li>
@@ -133,7 +133,7 @@
       <li><b data-count="6">6</b><span>atomic interactions</span></li>
       <li><b data-count="4">4</b><span>sensory modalities<br>(vision, audio, touch, force)</span></li>
       <li><b data-count="2100">2,100</b><span>benchmark tasks</span></li>
-      <li><b data-count="72.9" data-dec="1">72.9%</b><span>ROMA-7B success<br>(best baseline 53.0%)</span></li>
+      <li><b data-count="72.9" data-dec="1">72.9%</b><span>ROMA-7B success<br>(GPT-6 Astra 72.3%)</span></li>
     </ul>
 
     <div class="contribs">
@@ -428,8 +428,8 @@
   <div class="wrap">
     <header class="sec-head">
       <p class="eyebrow"><i></i>Results</p>
-      <h2>ROMA-7B beats frontier MLLMs on multi-sensory active perception</h2>
-      <p class="lead">ROMA-7B demonstrates the strongest advantages on long-chain and multi-attribute tasks. Numbers are task success rates (%).</p>
+      <h2>ROMA-7B matches GPT-6 Astra and leads other frontier MLLMs</h2>
+      <p class="lead">At only 7B parameters, ROMA-7B reaches 72.9% on ROMA Bench, on par with the latest GPT-6 Astra (72.3%) and well ahead of GPT-5.4 and Gemini 3.5 Flash. Its advantage is largest on long-chain, multi-attribute tasks that need audio and other complementary feedback. Numbers are task success rates (%).</p>
     </header>
 
     <div class="panel reveal">
@@ -449,9 +449,9 @@
     </div>
 
     <div class="wins">
-      <div class="win reveal"><b>+24.2</b><span>Multi-chain<br>over the best baseline</span></div>
-      <div class="win reveal"><b>+13.7</b><span>Intent-driven<br>over the best baseline</span></div>
-      <div class="win reveal"><b>+19.7</b><span>Real robot<br>over the best baseline</span></div>
+      <div class="win reveal"><b>+7.5</b><span>Multi-chain on ROMA Bench<br>over the best baseline, GPT-6 Astra</span></div>
+      <div class="win reveal"><b>+0.6</b><span>Overall on ROMA Bench<br>over GPT-6 Astra, at 7B scale</span></div>
+      <div class="win reveal"><b>+19.7</b><span>Real robot over the best<br>baseline besides GPT-6 Astra</span></div>
     </div>
 
     <div class="realworld">
@@ -513,9 +513,9 @@
     <div class="analysis-grid">
       <div class="acol">
         <div class="panel reveal">
-          <p class="chart-title">Accuracy vs. interaction cost</p>
+          <p class="chart-title">Accuracy vs. grasp &amp; interaction cost (times)</p>
           <div id="chart-scatter"></div>
-          <p class="fine">Interactions per scene on ROMA Bench with oracle boxes. <b>Exhaustive</b> grasps every object and runs all six interactions, about 4&times; the cost of ROMA-7B. GPT-5.4 and Gemini stop earlier, but often before the evidence is sufficient.</p>
+          <p class="fine">Grasp times + further interaction times per scene on ROMA Bench with oracle boxes. <b>Exhaustive</b> grasps every object and runs all six interactions (25.8 in total), about 3&times; the cost of ROMA-7B (8.2). GPT-5.4 and Gemini stop earlier, but often before the evidence is sufficient. GPT-6 Astra acts more (4.9 vs. 2.3 for GPT-5.4) and rises from 63.3% to 73.5%. ROMA-7B extends the perception chain further and reaches 76.0%.</p>
         </div>
         <div class="panel reveal">
           <p class="chart-title">Training ablations</p>
@@ -528,7 +528,7 @@
           <p class="chart-title">Share of each interaction</p>
           <div class="stack" id="chart-actions"></div>
           <ul class="stack-legend" id="actions-legend"></ul>
-          <p class="fine">Frontier models lean on <code>&lt;lift&gt;</code> and <code>&lt;squeeze&gt;</code>. ROMA uses <code>&lt;rotate&gt;</code>, <code>&lt;press&gt;</code> and <code>&lt;collide&gt;</code> as complementary probes.</p>
+          <p class="fine">GPT-5.4 and Gemini lean on <code>&lt;lift&gt;</code> and <code>&lt;squeeze&gt;</code>. ROMA uses <code>&lt;rotate&gt;</code>, <code>&lt;press&gt;</code> and <code>&lt;collide&gt;</code> as complementary probes.</p>
         </div>
         <div class="panel reveal">
           <p class="chart-title">Remove a modality, the matching capability degrades</p>

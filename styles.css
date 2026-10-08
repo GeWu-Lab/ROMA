@@ -283,7 +283,7 @@ h3 { font-size: 20px; line-height: 1.35; font-weight: 700; letter-spacing: -.01e
 .heat th { font-weight: 600; color: var(--muted); font-size: 12px; padding: 4px 4px; }
 .heat thead .grp { color: var(--ink); font-size: 13px; border-bottom: 2px solid var(--line); padding-bottom: 6px; }
 .heat tbody th { text-align: left; color: var(--ink); padding-right: 12px; white-space: nowrap; font-size: 13.5px; }
-.heat td { text-align: center; padding: 8px 4px; border-radius: 7px; background: rgba(43, 127, 224, calc(var(--a) * .62 + .03)); color: var(--ink); }
+.heat td { text-align: center; padding: 8px 4px; border-radius: 7px; background: rgba(43, 127, 224, calc(var(--a) * .74 + .02)); color: var(--ink); }
 .heat td.dark { color: #fff; }
 .heat td.best { font-weight: 800; }
 .heat td.all { outline: 1.5px solid rgba(15, 27, 45, .16); }
@@ -302,7 +302,7 @@ h3 { font-size: 20px; line-height: 1.35; font-weight: 700; letter-spacing: -.01e
 .acol { display: grid; gap: 24px; min-width: 0; }
 .scatter svg { width: 100%; height: auto; overflow: visible; }
 .scatter text { font-family: var(--sans); font-size: 13.5px; fill: var(--muted); }
-.scatter .pt-label { font-size: 14.5px; font-weight: 700; fill: var(--ink); }
+.scatter .pt-label { font-size: 14.5px; font-weight: 700; fill: var(--ink); stroke: #fff; stroke-width: 4px; paint-order: stroke; stroke-linejoin: round; }
 .scatter .grid { stroke: #efece3; stroke-width: 1; }
 .scatter .axis { stroke: var(--line); stroke-width: 1.5; }
 .scatter circle.pt { transition: r .25s; }

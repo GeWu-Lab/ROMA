@@ -456,10 +456,11 @@
   if (chordEl) drawChord(chordEl);
 
   /* ------------------------------------------------------------------ *
-   * Results (paper Tabs. 1, 2, 7)
+   * Results (paper Tabs. 1, 2, 7, including GPT-6 Astra)
    * ------------------------------------------------------------------ */
   const MODELS = [
     { key: 'gpt', name: 'GPT-5.4', color: '#12a3b8' },
+    { key: 'g6', name: 'GPT-6 Astra', color: '#7a63cc' },
     { key: 'gem', name: 'Gemini 3.5 Flash', color: '#e0527a' },
     { key: 'q25', name: 'Qwen 2.5-Omni', color: '#e9b12c' },
     { key: 'q3', name: 'Qwen 3-Omni', color: '#3fa46a' },
@@ -469,20 +470,20 @@
   const SETTINGS = [
     {
       tab: 'ROMA Bench',
-      note: 'Offline benchmark, 2,100 tasks. Grasp localization failures count as task failures.',
-      gpt: [45.1, 38.4, 56.0, 43.5], gem: [54.4, 49.9, 59.4, 53.0], q25: [21.1, 21.2, 26.3, 22.0],
+      note: 'Offline benchmark, 2,100 tasks. Grasp localization failures count as task failures. ROMA-7B is on par with GPT-6 Astra overall (72.9 vs 72.3): GPT-6 Astra is stronger on single-chain and intent-driven tasks, while ROMA-7B is clearly ahead on multi-chain tasks.',
+      gpt: [45.1, 38.4, 56.0, 43.5], g6: [76.9, 66.6, 79.9, 72.3], gem: [54.4, 49.9, 59.4, 53.0], q25: [21.1, 21.2, 26.3, 22.0],
       q3: [24.7, 13.3, 28.8, 19.7], roma: [71.1, 74.1, 73.1, 72.9],
     },
     {
       tab: 'Real robot',
-      note: '132 free-form tasks in 8 recreated scenes, answers checked by hand. Every model uses the same physical interface.',
-      gpt: [42.6, 29.4, 55.6, 40.2], gem: [50.0, 29.4, 48.1, 41.7], q25: [20.4, 29.4, 18.5, 23.5],
+      note: '132 free-form tasks in 8 recreated scenes, answers checked by hand. Every model uses the same physical interface. GPT-6 Astra is best overall (63.6), closely followed by ROMA-7B (61.4), which stays best on multi-chain tasks and ahead of GPT-5.4 and Gemini 3.5 Flash.',
+      gpt: [42.6, 29.4, 55.6, 40.2], g6: [64.8, 60.8, 66.7, 63.6], gem: [50.0, 29.4, 48.1, 41.7], q25: [20.4, 29.4, 18.5, 23.5],
       q3: [33.3, 15.7, 18.5, 23.5], roma: [57.4, 64.7, 63.0, 61.4],
     },
     {
       tab: 'Oracle boxes*',
-      note: 'Oracle boxes are offered and matching is relaxed, so localization errors mostly vanish for GPT and Gemini. <b>Not a realistic setting</b>. Frontier models catch up on several single-chain attributes, yet ROMA-7B stays ahead overall.',
-      gpt: [68.2, 58.5, 67.5, 63.3], gem: [74.5, 65.1, 67.5, 68.8], q25: [31.3, 32.1, 31.3, 31.7],
+      note: 'Oracle boxes are offered and matching is relaxed, so localization errors mostly vanish for GPT and Gemini (GPT-6 Astra already has very few, so it gains little). <b>Not a realistic setting</b>. GPT-6 Astra is strongest on single-chain and intent-driven tasks, while ROMA-7B leads multi-chain (76.4 vs 66.9) and overall (76.0 vs 73.5).',
+      gpt: [68.2, 58.5, 67.5, 63.3], g6: [78.3, 66.9, 83.9, 73.5], gem: [74.5, 65.1, 67.5, 68.8], q25: [31.3, 32.1, 31.3, 31.7],
       q3: [23.6, 14.8, 31.9, 20.5], roma: [75.0, 76.4, 77.1, 76.0],
     },
   ];
@@ -511,6 +512,7 @@
   const ATTR = ['Har.', 'Rou.', 'Tex.', 'Ins.', 'Mat.', 'Wei.', 'All'];
   const TABLE1 = [
     ['GPT-5.4', [34.3, 41.0, 38.1, 23.1, 60.1, 38.6, 45.1], [32.0, 37.6, 38.1, 41.3, 42.1, 35.8, 38.4], 56.0, 43.5],
+    ['GPT-6 Astra', [70.7, 88.5, 76.2, 32.1, 75.9, 100.0, 76.9], [62.8, 72.1, 65.9, 56.3, 68.6, 75.2, 66.6], 79.9, 72.3],
     ['Gemini 3.5 Flash', [45.5, 66.7, 50.0, 28.2, 58.4, 60.8, 54.4], [48.3, 58.8, 46.9, 46.4, 51.8, 52.9, 49.9], 59.4, 53.0],
     ['Qwen 2.5-Omni', [19.2, 12.8, 9.5, 5.1, 37.8, 5.9, 21.1], [20.1, 16.4, 18.8, 23.3, 28.8, 15.0, 21.2], 26.3, 22.0],
     ['Qwen 3-Omni', [4.0, 14.1, 19.0, 6.4, 53.3, 0.0, 24.7], [12.3, 10.3, 16.6, 16.8, 22.0, 0.7, 13.3], 28.8, 19.7],
@@ -548,10 +550,12 @@
     mount(scatter, (el) => {
       el.classList.add('scatter');
       const W = 520, H = 310, L = 50, Rr = 14, T = 20, B = 48;
-      const xmax = 24, ymin = 55, ymax = 80;
+      // x = grasps + further interactions per scene (paper Tab. 3, ROMA Bench with oracle boxes)
+      const xmax = 28, ymin = 55, ymax = 80;
+      const EXH = 3.68 + 22.09, ROMA_X = 2.75 + 5.40;
       const X = (v) => L + (v / xmax) * (W - L - Rr);
       const Y = (v) => T + (1 - (v - ymin) / (ymax - ymin)) * (H - T - B);
-      const svg = s('svg', { viewBox: `0 0 ${W} ${H}`, role: 'img', 'aria-label': 'Accuracy versus interactions per scene' });
+      const svg = s('svg', { viewBox: `0 0 ${W} ${H}`, role: 'img', 'aria-label': 'Accuracy versus grasps and interactions per scene' });
       const defs = s('defs', {}, s('linearGradient', { id: 'romaGrad', x1: 0, y1: 1, x2: 1, y2: 0 },
         s('stop', { offset: 0, 'stop-color': '#2b7fe0' }), s('stop', { offset: .6, 'stop-color': '#7a63cc' }), s('stop', { offset: 1, 'stop-color': '#f5921e' })));
       svg.append(defs);
@@ -559,30 +563,33 @@
         svg.append(s('line', { class: 'grid', x1: L, x2: W - Rr, y1: Y(y), y2: Y(y) }));
         svg.append(s('text', { x: L - 8, y: Y(y) + 4, 'text-anchor': 'end', text: y }));
       }
-      for (let x = 0; x <= 20; x += 5) svg.append(s('text', { x: X(x), y: H - B + 20, 'text-anchor': 'middle', text: x }));
+      for (let x = 0; x <= 25; x += 5) svg.append(s('text', { x: X(x), y: H - B + 20, 'text-anchor': 'middle', text: x }));
       svg.append(s('line', { class: 'axis', x1: L, x2: W - Rr, y1: H - B, y2: H - B }));
-      svg.append(s('text', { x: (L + W - Rr) / 2, y: H - 6, 'text-anchor': 'middle', text: 'further interactions per scene' }));
+      svg.append(s('text', { x: (L + W - Rr) / 2, y: H - 6, 'text-anchor': 'middle', text: 'grasps + further interactions per scene' }));
       svg.append(s('text', { x: 12, y: (T + H - B) / 2, 'text-anchor': 'middle', transform: `rotate(-90 12 ${(T + H - B) / 2})`, text: 'total accuracy (%)' }));
       // exhaustive marker
-      const ex = X(22.09);
+      const ex = X(EXH);
       svg.append(s('line', { x1: ex, x2: ex, y1: T, y2: H - B, stroke: '#c9c4b6', 'stroke-width': 2, 'stroke-dasharray': '5 5' }));
       svg.append(s('text', { x: ex - 8, y: T + 14, 'text-anchor': 'end', style: 'font-weight:700;fill:#33415a', text: 'Exhaustive' }));
-      svg.append(s('text', { x: ex - 8, y: T + 29, 'text-anchor': 'end', text: '22.1, all six on every object' }));
-      // bracket for ~4x
-      const by = Y(72);
-      svg.append(s('path', { d: `M${X(5.4)},${by} H${ex}`, stroke: '#9aa3b5', 'stroke-width': 1.6, fill: 'none', 'marker-end': 'url(#arr)' }));
+      svg.append(s('text', { x: ex - 8, y: T + 29, 'text-anchor': 'end', text: '25.8, all six on every object' }));
+      // bracket for ~3x
+      const by = Y(58.5); // low in the plot, clear of the model labels above
+      svg.append(s('path', { d: `M${X(ROMA_X)},${by} H${ex}`, stroke: '#9aa3b5', 'stroke-width': 1.6, fill: 'none', 'marker-end': 'url(#arr)' }));
       svg.append(s('defs', {}, s('marker', { id: 'arr', viewBox: '0 0 10 10', refX: 8, refY: 5, markerWidth: 7, markerHeight: 7, orient: 'auto' },
         s('path', { d: 'M0,0 L10,5 L0,10 z', fill: '#9aa3b5' }))));
-      svg.append(s('text', { x: (X(5.4) + ex) / 2, y: by - 8, 'text-anchor': 'middle', style: 'font-weight:700;fill:#33415a', text: '≈ 4× more interactions' }));
+      svg.append(s('text', { x: (X(ROMA_X) + ex) / 2, y: by - 8, 'text-anchor': 'middle', style: 'font-weight:700;fill:#33415a', text: '≈ 3× more grasps & interactions' }));
+      // dashed drop line under the ROMA-7B point, same style as the Exhaustive line
+      svg.append(s('line', { x1: X(ROMA_X), x2: X(ROMA_X), y1: Y(76.0) + 12, y2: H - B, stroke: '#c9c4b6', 'stroke-width': 2, 'stroke-dasharray': '5 5' }));
       const pts = [
-        { n: 'GPT-5.4', x: 1.20, y: 63.3, fill: '#12a3b8' },
-        { n: 'Gemini 3.5 Flash', x: 2.77, y: 68.8, fill: '#e0527a' },
-        { n: 'ROMA-7B', x: 5.40, y: 76.0, fill: 'url(#romaGrad)', big: true },
+        { n: 'GPT-5.4', x: 1.10 + 1.20, y: 63.3, fill: '#12a3b8' },
+        { n: 'GPT-6 Astra', x: 2.29 + 2.61, y: 73.5, fill: '#7a63cc' },
+        { n: 'Gemini 3.5 Flash', x: 2.23 + 2.77, y: 68.8, fill: '#e0527a' },
+        { n: 'ROMA-7B', x: ROMA_X, y: 76.0, fill: 'url(#romaGrad)', big: true },
       ];
       pts.forEach((p) => {
         svg.append(s('circle', { class: 'pt', cx: X(p.x), cy: Y(p.y), r: p.big ? 12 : 9, fill: p.fill, stroke: '#fff', 'stroke-width': 3 },
-          s('title', { text: `${p.n}: ${p.y}% with ${p.x} interactions per scene` })));
-        svg.append(s('text', { class: 'pt-label', x: X(p.x) + (p.big ? 18 : 15), y: Y(p.y) + 4, text: `${p.n}  ${p.y}%` }));
+          s('title', { text: `${p.n}: ${p.y}% with ${p.x.toFixed(2)} grasps + interactions per scene` })));
+        svg.append(s('text', { class: 'pt-label', x: X(p.x) + (p.big ? 18 : 15), y: Y(p.y) + 9, text: `${p.n}  ${p.y}%` }));
       });
       el.append(svg);
     });
