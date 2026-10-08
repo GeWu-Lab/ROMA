@@ -4,7 +4,7 @@
 
 <h1 align="center">ROMA: LLM System for Real-World Object-Centric<br>Multi-Sensory Active Perception</h1>
 
-<h3 align="center"><em>I saw. I touched. I understood.</em></h3>
+<h3 align="center"><em>I saw, I touched, I understood.</em></h3>
 
 <p align="center">
   <a href="https://gewu-lab.github.io/ROMA/"><img src="https://img.shields.io/badge/Project-Page-blue" alt="Project Page"></a>
@@ -12,7 +12,7 @@
   <a href="https://github.com/GeWu-Lab/ROMA"><img src="https://img.shields.io/badge/Code-GitHub-black" alt="Code"></a>
 </p>
 <p align="center">
-  <a href="https://xxuan01.github.io/">Ruoxuan Feng</a><sup>*</sup>, <a href="https://github.com/gitagitty">Yutong Chen</a><sup>*</sup>, <a href="https://scholar.google.com.hk/citations?user=v5LctN8AAAAJ">Ruihua Song</a>, <a href="https://hyang0511.github.io/">Huan Yang</a>, <a href="https://www.wangzhongyuan.com/">Zhongyuan Wang</a>, <a href="https://scholar.google.com/citations?user=FLkv_vIAAAAJ">Guocai Yao</a>, <a href="https://dtaoo.github.io/">Di Hu</a><sup>&#9993;</sup>
+  <a href="https://xxuan01.github.io/">Ruoxuan Feng</a><sup>*</sup>, <a href="https://gitagitty.github.io/">Yutong Chen</a><sup>*</sup>, <a href="https://scholar.google.com.hk/citations?user=v5LctN8AAAAJ">Ruihua Song</a>, <a href="https://hyang0511.github.io/">Huan Yang</a>, <a href="https://www.wangzhongyuan.com/">Zhongyuan Wang</a>, <a href="https://scholar.google.com/citations?user=FLkv_vIAAAAJ">Guocai Yao</a>, <a href="https://dtaoo.github.io/">Di Hu</a><sup>&#9993;</sup>
   <br>
   <sup>*</sup>Equal contribution &nbsp; <sup>&#9993;</sup>Corresponding author
 </p>
@@ -136,8 +136,10 @@ If you find this work useful, please consider citing:
 ```bibtex
 @article{feng2026roma,
   title   = {ROMA: LLM System for Real-World Object-Centric Multi-Sensory Active Perception},
-  author  = {Feng, Ruoxuan and Chen, Yutong and Song, Ruihua and Yang, Huan and Wang, Zhongyuan and Yao, Guocai and Hu, Di},
-  journal = {arXiv preprint},
+  author  = {Feng, Ruoxuan and Chen, Yutong and Song, Ruihua and Yang, Huan and
+             Wang, Zhongyuan and Yao, Guocai and Hu, Di},
+  journal = {arXiv preprint arXiv:2610.06955},
+  url     = {https://arxiv.org/abs/2610.06955},
   year    = {2026}
 }
 ```
