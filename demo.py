@@ -739,6 +739,8 @@ EXAMPLES = [
     "Is there anything inside the red box? If so, what is it?",
     "Which is heavier, the can or the green cup?",
     "Which objects are made of metal?",
+    "How many objects are empty?",
+    "How many objects are heavier than the cup?",
     "I am hungry.",
     "Is there water?",
     "Is the red box suitable to hold water?",
