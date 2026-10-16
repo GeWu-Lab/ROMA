@@ -8,7 +8,8 @@
 
 <p align="center">
   <a href="https://gewu-lab.github.io/ROMA/"><img src="https://img.shields.io/badge/Project-Page-blue" alt="Project Page"></a>
-  <a href="https://huggingface.co/datasets/GeWu-Lab/ROMA"><img src="https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Checkpoint%20%26%20Dataset-yellow" alt="Hugging Face"></a>
+  <a href="https://huggingface.co/GeWu-Lab/ROMA-7B"><img src="https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Checkpoint-yellow" alt="Hugging Face"></a>
+  <a href="https://huggingface.co/datasets/GeWu-Lab/ROMA"><img src="https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Dataset-yellow" alt="Hugging Face Dataset"></a>
   <a href="https://github.com/GeWu-Lab/ROMA"><img src="https://img.shields.io/badge/Code-GitHub-black" alt="Code"></a>
 </p>
 <p align="center">
@@ -33,9 +34,9 @@ Humans build an understanding of the physical world through an active process: w
 
 This repository accompanies the paper and contains:
 
-- **ROMA-7B**, a multi-sensory LLM built on [Qwen2.5-Omni](https://github.com/QwenLM/Qwen2.5-Omni) with action / modality tokens, an audio branch, and an [AnyTouch 2](https://github.com/GeWu-Lab/AnyTouch2) tactile branch, trained with multi-sensory alignment followed by active-perception SFT.
-- **ROMI-2K**, a real-world multi-sensory object interaction dataset covering nearly 2,000 objects and 6 atomic interactions with synchronized visual, audio, tactile, and force feedback. (Coming Soon!)
-- **ROMA Bench**, 2,100 scene-level tasks (single-chain, multi-chain, and intent-driven) for evaluating active perception. (Coming Soon!)
+- **ROMA-7B** ([checkpoint](https://huggingface.co/GeWu-Lab/ROMA-7B)), a multi-sensory LLM built on [Qwen2.5-Omni](https://github.com/QwenLM/Qwen2.5-Omni) with action / modality tokens, an audio branch, and an [AnyTouch 2](https://github.com/GeWu-Lab/AnyTouch2) tactile branch, trained with multi-sensory alignment followed by active-perception SFT.
+- **ROMI-2K** ([dataset](https://huggingface.co/datasets/GeWu-Lab/ROMA)), a real-world multi-sensory object interaction dataset covering nearly 2,000 objects and 6 atomic interactions with synchronized visual, audio, tactile, and force feedback.
+- **ROMA Bench** ([dataset](https://huggingface.co/datasets/GeWu-Lab/ROMA)), 2,100 scene-level tasks (single-chain, multi-chain, and intent-driven) for evaluating active perception.
 - A local **web demo** that streams ROMA's active-perception process on a real tabletop scene.
 
 ### Highlights
@@ -78,28 +79,30 @@ pip install -r requirements.txt
 
 ## Usage
 
-### 1. Download the checkpoint and dataset
+### 1. Download the checkpoint
 
-Before running, pull [GeWu-Lab/ROMA](https://huggingface.co/datasets/GeWu-Lab/ROMA) from Hugging Face into the `resources` directory:
+Before running, pull the [GeWu-Lab/ROMA-7B](https://huggingface.co/GeWu-Lab/ROMA-7B) checkpoint from Hugging Face into the `resources` directory (the demo only needs the checkpoint; the datasets are released separately in [GeWu-Lab/ROMA](https://huggingface.co/datasets/GeWu-Lab/ROMA)):
 
 ```bash
-hf download GeWu-Lab/ROMA --repo-type dataset --local-dir resources
+hf download GeWu-Lab/ROMA-7B --repo-type model --local-dir resources/models/ROMA-7B
 ```
 
-The ROMA-7B checkpoint directory (`ROMA-Qwen2.5-Omni-7B`) is expected to contain:
+The ROMA-7B checkpoint directory (`ROMA-7B`) is expected to contain:
 
 ```
-ROMA-Qwen2.5-Omni-7B/
-├── xxx.safetensors     # base Qwen2.5-Omni-7B model
+ROMA-7B/
+├── model-0000*-of-00005.safetensors  # base Qwen2.5-Omni-7B model
+├── model.safetensors.index.json
 ├── anytouch2.pth        # tactile encoder
 ├── audio.bin            # fine-tuned audio adapter and encoder
 ├── tactile.bin          # fine-tuned tactile adapter
-└── ROMA-LLM.bin         # ROMA LLM weights
+├── ROMA-LLM.bin         # ROMA LLM weights
+└── config / tokenizer files
 ```
 
 ### 2. Check the checkpoint path
 
-The demo reads the checkpoint directory from `MODEL_PATH_2_5` in [`config/global_name.py`](config/global_name.py), which defaults to `resources/models/ROMA-Qwen2.5-Omni-7B`. If you downloaded the checkpoint elsewhere, edit this path accordingly.
+The demo reads the checkpoint directory from `MODEL_PATH_2_5` in [`config/global_name.py`](config/global_name.py), which defaults to `resources/models/ROMA-7B`. If you downloaded the checkpoint elsewhere, edit this path accordingly.
 
 ### 3. Run the web demo
 
