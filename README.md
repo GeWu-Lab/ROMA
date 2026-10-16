@@ -8,6 +8,7 @@
 
 <p align="center">
   <a href="https://gewu-lab.github.io/ROMA/"><img src="https://img.shields.io/badge/Project-Page-blue" alt="Project Page"></a>
+  <a href="https://arxiv.org/abs/2610.06955"><img src="https://img.shields.io/badge/arXiv-2610.06955-b31b1b" alt="Paper"></a>
   <a href="https://huggingface.co/GeWu-Lab/ROMA-7B"><img src="https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Checkpoint-yellow" alt="Hugging Face"></a>
   <a href="https://huggingface.co/datasets/GeWu-Lab/ROMA"><img src="https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Dataset-yellow" alt="Hugging Face Dataset"></a>
   <a href="https://github.com/GeWu-Lab/ROMA"><img src="https://img.shields.io/badge/Code-GitHub-black" alt="Code"></a>
@@ -32,7 +33,7 @@ Humans build an understanding of the physical world through an active process: w
 
 **ROMA** is an LLM-based system for **R**eal-World **O**bject-Centric **M**ulti-Sensory **A**ctive Perception. It integrates vision, audio, touch, and force into a *reasoning-interaction-feedback* loop: the LLM identifies the missing evidence and selects the target object, the interaction (`lift`, `press`, `collide`, `shake`, `rotate`, `squeeze`), and the sensory modalities, while a physical interface executes the interaction and returns the multi-sensory feedback.
 
-This repository accompanies the paper and contains:
+This repository accompanies the paper [arXiv:2610.06955](https://arxiv.org/abs/2610.06955) and contains:
 
 - **ROMA-7B** ([checkpoint](https://huggingface.co/GeWu-Lab/ROMA-7B)), a multi-sensory LLM built on [Qwen2.5-Omni](https://github.com/QwenLM/Qwen2.5-Omni) with action / modality tokens, an audio branch, and an [AnyTouch 2](https://github.com/GeWu-Lab/AnyTouch2) tactile branch, trained with multi-sensory alignment followed by active-perception SFT.
 - **ROMI-2K** ([dataset](https://huggingface.co/datasets/GeWu-Lab/ROMA)), a real-world multi-sensory object interaction dataset covering nearly 2,000 objects and 6 atomic interactions with synchronized visual, audio, tactile, and force feedback.
