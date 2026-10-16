@@ -81,6 +81,8 @@ sup { font-size: .62em; line-height: 0; color: var(--muted); margin-left: 2px; f
 .btn { display: inline-flex; align-items: center; gap: 9px; padding: 11px 22px; border-radius: 999px; background: var(--ink); color: #fff; font-weight: 600; font-size: 15px; text-decoration: none; box-shadow: 0 10px 22px -12px rgba(15, 27, 45, .7); transition: transform .2s, background .2s, box-shadow .2s; }
 .btn svg { width: 19px; height: 19px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
 .btn:hover { transform: translateY(-2px); background: #1c2e4a; box-shadow: 0 14px 26px -12px rgba(15, 27, 45, .7); }
+.btn.btn-orange { background: #e8820a; box-shadow: 0 10px 22px -12px rgba(232, 130, 10, .9); }
+.btn.btn-orange:hover { background: #d4730a; box-shadow: 0 14px 26px -12px rgba(232, 130, 10, .9); }
 .btn[aria-disabled="true"] { background: #e9e6db; color: #7c8496; box-shadow: none; cursor: default; }
 .btn[aria-disabled="true"]:hover { transform: none; background: #e9e6db; }
 .btn em { font-style: normal; font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; background: #fff; color: var(--muted); padding: 2px 8px; border-radius: 999px; }
