@@ -9,6 +9,7 @@
 <p align="center">
   <a href="https://gewu-lab.github.io/ROMA/"><img src="https://img.shields.io/badge/Project-Page-blue" alt="Project Page"></a>
   <a href="https://arxiv.org/abs/2610.06955"><img src="https://img.shields.io/badge/arXiv-2610.06955-b31b1b" alt="Paper"></a>
+  <a href="https://huggingface.co/spaces/xxuan01/ROMA-Demo"><img src="https://img.shields.io/badge/%F0%9F%A4%97%20Try%20ROMA%20Online!-Demo-orange" alt="Try ROMA Online!"></a>
   <a href="https://huggingface.co/GeWu-Lab/ROMA-7B"><img src="https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Checkpoint-yellow" alt="Hugging Face"></a>
   <a href="https://huggingface.co/datasets/GeWu-Lab/ROMA"><img src="https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Dataset-yellow" alt="Hugging Face Dataset"></a>
   <a href="https://github.com/GeWu-Lab/ROMA"><img src="https://img.shields.io/badge/Code-GitHub-black" alt="Code"></a>
@@ -22,6 +23,11 @@
 
 
 ---
+
+## News
+
+- **[2026/10/16]** We built an online GUI demo. [Try it now!](https://huggingface.co/spaces/xxuan01/ROMA-Demo)
+- **[2026/10/07]** We released the [ROMA-7B checkpoint](https://huggingface.co/GeWu-Lab/ROMA-7B) and the inference demo code.
 
 ## Introduction
 
