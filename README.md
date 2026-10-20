@@ -26,6 +26,7 @@
 
 ## News
 
+- **[2026/10/20]** We released the [ROMA Bench](https://huggingface.co/datasets/GeWu-Lab/ROMA) QA tasks and the evaluation code.
 - **[2026/10/16]** We built an online GUI demo. [Try it now!](https://huggingface.co/spaces/xxuan01/ROMA-Demo)
 - **[2026/10/07]** We released the [ROMA-7B checkpoint](https://huggingface.co/GeWu-Lab/ROMA-7B) and the inference demo code.
 
@@ -45,6 +46,7 @@ This repository accompanies the paper [arXiv:2610.06955](https://arxiv.org/abs/2
 - **ROMI-2K** ([dataset](https://huggingface.co/datasets/GeWu-Lab/ROMA)), a real-world multi-sensory object interaction dataset covering nearly 2,000 objects and 6 atomic interactions with synchronized visual, audio, tactile, and force feedback.
 - **ROMA Bench** ([dataset](https://huggingface.co/datasets/GeWu-Lab/ROMA)), 2,100 scene-level tasks (single-chain, multi-chain, and intent-driven) for evaluating active perception.
 - A local **web demo** that streams ROMA's active-perception process on a real tabletop scene.
+- The **ROMA Bench evaluation code** (multi-GPU batched inference and result statistics).
 
 ### Highlights
 
@@ -82,7 +84,7 @@ pip install torch==2.6.0 torchvision==0.21.0 torchaudio==2.6.0 --index-url https
 pip install -r requirements.txt
 ```
 
-**(Optional)** Install [FlashAttention](https://github.com/Dao-AILab/flash-attention) for faster inference. If installed, enable it by uncommenting the `attn_implementation="flash_attention_2"` line in `demo.py`.
+**(Highly Recommended)** Install [FlashAttention](https://github.com/Dao-AILab/flash-attention) for faster inference. When it is installed, `demo.py` and `eval_roma_7b.py` use it automatically (`attn_implementation="flash_attention_2"`); otherwise they fall back to the default attention.
 
 ## Usage
 
@@ -119,11 +121,54 @@ python demo.py --gpu 0 --port 7860
 
 Then open `http://localhost:7860`, type a question (or pick an example), and press **Ask ROMA**. The base model and all adapters are loaded from the checkpoint directory in the same order as during training (base Qwen2.5-Omni, tactile encoder, new tokens, audio adapter, tactile adapter, ROMA LLM). Options: `--gpu`, `--host`, `--port`, `--share` (create a public Gradio link).
 
+## Evaluation on ROMA Bench
+
+### 1. Download the dataset
+
+Download the [GeWu-Lab/ROMA](https://huggingface.co/datasets/GeWu-Lab/ROMA) dataset into `resources/datasets`:
+
+```bash
+hf download GeWu-Lab/ROMA --repo-type dataset --local-dir resources/datasets
+```
+
+The evaluation uses:
+
+```
+resources/datasets/
+├── ROMA-Bench/              # scenes: initial image, save.json, and the recorded feedback of each object
+└── roma_bench_tasks.json    # 2,100 QA tasks and labels
+```
+
+The paths are set in [`config/global_name.py`](config/global_name.py) (`ROMA_BENCH_DIR`, `ROMA_BENCH_QA_PATH`, and `ROMA_BENCH_RESULTS_DIR` for the outputs, default `results/roma_bench`); edit them if you put the data elsewhere.
+
+### 2. Run inference
+
+```bash
+bash run_eval.sh "0,1,2,3" 8 50   # [gpus] [batch_size] [save_every]
+```
+
+`run_eval.sh` starts one [`eval_roma_7b.py`](eval_roma_7b.py) process per GPU. Each process handles its own shard of the tasks and runs `batch_size` tasks in parallel with continuous batching. For every task, ROMA generates until it emits an action token, the recorded feedback of the grasped object is loaded from `ROMA-Bench`, and generation continues until the model answers (at most 20 rounds). Each GPU saves its results to `eval_roma_bench_<shard>.json` / `error_roma_bench_<shard>.json` every `save_every` finished tasks and once more at the end; logs are written to `logs/`.
+
+To run a single process directly: `python eval_roma_7b.py --gpu 0 --batch_size 8 --save_every 10` (see `--help` for the path options).
+
+### 3. Compute the results
+
+```bash
+python check_eval_results.py
+```
+
+It reads every `eval_roma_bench_*.json` in the results directory (or the files matched by `--results "<glob>"`) and reports the overall accuracy, the accuracy by level / category / task type, interaction statistics, and a final Level × Category summary table.
+
+> **Note:** The Correct / Error counts printed at the end of `eval_roma_7b.py` are only a rough exact match, since the model output is not always just the option letter(s). Use the results of `check_eval_results.py`.
+
 ## Repository Structure
 
 ```
 ROMA
 ├── demo.py                # local web demo (Gradio)
+├── eval_roma_7b.py        # ROMA Bench inference (batched, one process per GPU)
+├── run_eval.sh            # multi-GPU launcher for eval_roma_7b.py
+├── check_eval_results.py  # ROMA Bench result statistics
 ├── qwen25omni/            # Qwen2.5-Omni modified with the tactile modality
 ├── anytouch2/             # tactile encoder
 ├── my_qwen_omni_utils/    # audio / vision / tactile input processing
@@ -135,7 +180,7 @@ ROMA
 
 - [x] Release the local web demo
 - [x] Release ROMA-7B checkpoint and the ROMI-2K dataset
-- [ ] Release the ROMA Bench evaluation code
+- [x] Release the ROMA Bench evaluation code
 - [ ] Release the training code (multi-sensory alignment and active-perception SFT)
 - [ ] Release the physical interface (grasp interface and interaction execution)
 

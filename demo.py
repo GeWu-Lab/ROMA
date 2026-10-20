@@ -23,6 +23,7 @@ import gradio as gr
 import numpy as np
 import torch
 from transformers import StoppingCriteria, StoppingCriteriaList, TextIteratorStreamer
+from transformers.utils import is_flash_attn_2_available
 
 from my_qwen_omni_utils import process_mm_info
 from qwen25omni.modeling_qwen2_5_omni import Qwen2_5OmniForConditionalGeneration
@@ -314,11 +315,14 @@ class RomaEngine:
     def __init__(self, roma_dir):
         # Base Qwen2.5-Omni first, then the tactile encoder / new tokens / audio adapter / tactile adapter / LLM, as in eval.py
         base_path = roma_dir
+        # Use flash attention 2 when the flash_attn package is installed, otherwise the default attention
+        attn_implementation = "flash_attention_2" if is_flash_attn_2_available() else None
+        print(f"attn_implementation: {attn_implementation or 'default'}")
         self.model = Qwen2_5OmniForConditionalGeneration.from_pretrained(
             base_path,
             torch_dtype=torch.bfloat16,
             device_map="auto",
-            # attn_implementation="flash_attention_2",
+            attn_implementation=attn_implementation,
         )
         self.model.disable_talker()
 
